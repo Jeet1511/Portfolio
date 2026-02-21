@@ -175,17 +175,56 @@ export default function PublicPortfolio() {
                     <h1 className="portfolio-name">{user.displayName}</h1>
                     <p className="portfolio-username">@{user.username}</p>
 
+                    {(activeSocials.length > 0 || customLinks.length > 0) && (
+                        <div className="portfolio-social">
+                            {activeSocials.map(([platform, url]) => {
+                                const Icon = socialIcons[platform] || Globe;
+                                const href = platform === 'email'
+                                    ? `mailto:${url}`
+                                    : (url.startsWith('http') ? url : `https://${url}`);
+                                return (
+                                    <a
+                                        key={platform}
+                                        href={href}
+                                        target={platform === 'email' ? '_self' : '_blank'}
+                                        rel="noopener noreferrer"
+                                        title={socialLabels[platform] || platform}
+                                    >
+                                        <Icon size={18} />
+                                    </a>
+                                );
+                            })}
+                            {customLinks.map((link, i) => (
+                                <a
+                                    key={`custom-${i}`}
+                                    href={link.url ? (link.url.startsWith('http') ? link.url : `https://${link.url}`) : '#'}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title={link.label}
+                                >
+                                    {link.icon && link.icon.startsWith('data:image/svg') ? (
+                                        <img
+                                            src={link.icon}
+                                            alt=""
+                                            style={{ width: 18, height: 18, filter: 'brightness(0) invert(1)' }}
+                                        />
+                                    ) : (
+                                        <LinkIcon size={18} />
+                                    )}
+                                </a>
+                            ))}
+                        </div>
+                    )}
+
                     {user.bio && <p className="portfolio-bio">{user.bio}</p>}
 
                     {user.skills && user.skills.length > 0 && (() => {
-                        // Group skills by category
                         const grouped = {};
                         user.skills.forEach((skill) => {
                             const info = getTechInfo(skill);
                             if (!grouped[info.category]) grouped[info.category] = [];
                             grouped[info.category].push(info);
                         });
-                        // Define category order
                         const categoryOrder = ['Languages', 'Frameworks', 'Databases', 'Cloud & DevOps', 'Tools', 'AI & Data', 'Other'];
                         const sortedCategories = categoryOrder.filter(c => grouped[c]);
                         return (
@@ -209,59 +248,6 @@ export default function PublicPortfolio() {
                             </div>
                         );
                     })()}
-
-                    {(activeSocials.length > 0 || customLinks.length > 0) && (
-                        <div className="portfolio-social">
-                            {activeSocials.map(([platform, url]) => {
-                                const Icon = socialIcons[platform] || Globe;
-                                const href = platform === 'email'
-                                    ? `mailto:${url}`
-                                    : (url.startsWith('http') ? url : `https://${url}`);
-                                return (
-                                    <a
-                                        key={platform}
-                                        href={href}
-                                        target={platform === 'email' ? '_self' : '_blank'}
-                                        rel="noopener noreferrer"
-                                        title={socialLabels[platform] || platform}
-                                    >
-                                        <Icon size={18} />
-                                    </a>
-                                );
-                            })}
-                            {customLinks.map((link, i) => (
-                                <a
-                                    key={`custom-${i}`}
-                                    href={link.url.startsWith('http') ? link.url : `https://${link.url}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    title={link.label}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: 6,
-                                        width: 'auto',
-                                        padding: '0 14px',
-                                        borderRadius: '20px',
-                                        fontSize: '0.8rem',
-                                        fontWeight: 600,
-                                    }}
-                                >
-                                    {link.icon && link.icon.startsWith('data:image/svg') ? (
-                                        <img
-                                            src={link.icon}
-                                            alt=""
-                                            style={{ width: 14, height: 14, filter: 'brightness(0) invert(1)' }}
-                                        />
-                                    ) : (
-                                        <LinkIcon size={14} />
-                                    )}
-                                    {link.label}
-                                </a>
-                            ))}
-                        </div>
-                    )}
                 </div>
 
                 {/* Projects */}
