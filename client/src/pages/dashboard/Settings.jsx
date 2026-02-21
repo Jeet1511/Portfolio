@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import ImageCropper from '../../components/ImageCropper';
-import { Save, AlertCircle, CheckCircle, X, User, Plus, Trash2, Link as LinkIcon } from 'lucide-react';
+import { Save, AlertCircle, CheckCircle, X, User, Plus, Trash2, Link as LinkIcon, Mail, Image } from 'lucide-react';
 
 export default function Settings() {
     const { user, apiFetch, updateUser } = useAuth();
@@ -16,6 +16,7 @@ export default function Settings() {
             twitter: '',
             website: '',
             instagram: '',
+            email: '',
         },
         customSocialLinks: [],
     });
@@ -36,6 +37,7 @@ export default function Settings() {
                     twitter: user.socialLinks?.twitter || '',
                     website: user.socialLinks?.website || '',
                     instagram: user.socialLinks?.instagram || '',
+                    email: user.socialLinks?.email || '',
                 },
                 customSocialLinks: user.customSocialLinks || [],
             });
@@ -62,7 +64,7 @@ export default function Settings() {
     const addCustomLink = () => {
         setFormData({
             ...formData,
-            customSocialLinks: [...formData.customSocialLinks, { label: '', url: '' }],
+            customSocialLinks: [...formData.customSocialLinks, { label: '', url: '', icon: '' }],
         });
     };
 
@@ -232,11 +234,12 @@ export default function Settings() {
                             { key: 'twitter', label: 'Twitter / X', placeholder: 'https://twitter.com/username' },
                             { key: 'instagram', label: 'Instagram', placeholder: 'https://instagram.com/username' },
                             { key: 'website', label: 'Website', placeholder: 'https://yourwebsite.com' },
+                            { key: 'email', label: 'Email', placeholder: 'your@email.com' },
                         ].map((social) => (
                             <div className="form-group" key={social.key}>
                                 <label className="form-label">{social.label}</label>
                                 <input
-                                    type="url"
+                                    type={social.key === 'email' ? 'email' : 'url'}
                                     className="form-input"
                                     placeholder={social.placeholder}
                                     value={formData.socialLinks[social.key]}
@@ -252,22 +255,31 @@ export default function Settings() {
                         Custom Links
                     </h3>
                     <p className="form-hint" style={{ marginBottom: 16 }}>
-                        Add any additional links to display on your portfolio (e.g. Dribbble, Behance, YouTube, Blog, etc.)
+                        Add any additional links to display on your portfolio. You can optionally paste an SVG data URL for a custom icon (e.g. from Lucide, Simple Icons, etc.)
                     </p>
 
                     {formData.customSocialLinks.length > 0 && (
                         <div style={{ marginBottom: 16 }}>
                             {formData.customSocialLinks.map((link, index) => (
                                 <div className="custom-social-item" key={index}>
-                                    <input
-                                        type="text"
-                                        className="form-input"
-                                        placeholder="Label (e.g. Dribbble)"
-                                        value={link.label}
-                                        onChange={(e) => updateCustomLink(index, 'label', e.target.value)}
-                                        maxLength={50}
-                                        style={{ marginBottom: 0 }}
-                                    />
+                                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                                        {link.icon && link.icon.startsWith('data:image/svg') && (
+                                            <img
+                                                src={link.icon}
+                                                alt="icon"
+                                                style={{ width: 20, height: 20, filter: 'brightness(0) invert(1)', flexShrink: 0 }}
+                                            />
+                                        )}
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            placeholder="Label (e.g. Dribbble)"
+                                            value={link.label}
+                                            onChange={(e) => updateCustomLink(index, 'label', e.target.value)}
+                                            maxLength={50}
+                                            style={{ marginBottom: 0 }}
+                                        />
+                                    </div>
                                     <input
                                         type="url"
                                         className="form-input"
@@ -275,6 +287,14 @@ export default function Settings() {
                                         value={link.url}
                                         onChange={(e) => updateCustomLink(index, 'url', e.target.value)}
                                         style={{ marginBottom: 0 }}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        placeholder="SVG data URL (optional)"
+                                        value={link.icon || ''}
+                                        onChange={(e) => updateCustomLink(index, 'icon', e.target.value)}
+                                        style={{ marginBottom: 0, fontSize: '0.75rem' }}
                                     />
                                     <button
                                         type="button"

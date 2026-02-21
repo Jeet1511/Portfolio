@@ -54,10 +54,12 @@ const userSchema = new mongoose.Schema({
         twitter: { type: String, default: '' },
         website: { type: String, default: '' },
         instagram: { type: String, default: '' },
+        email: { type: String, default: '' },
     },
     customSocialLinks: [{
         label: { type: String, required: true, maxlength: 50 },
         url: { type: String, required: true },
+        icon: { type: String, default: '' },
     }],
     profileViews: {
         type: Number,

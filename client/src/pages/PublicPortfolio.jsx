@@ -15,6 +15,7 @@ import {
     Link as LinkIcon,
     X,
     Calendar,
+    Mail,
 } from 'lucide-react';
 
 export default function PublicPortfolio() {
@@ -108,6 +109,7 @@ export default function PublicPortfolio() {
         twitter: Twitter,
         website: Globe,
         instagram: Instagram,
+        email: Mail,
     };
 
     const socialLabels = {
@@ -116,6 +118,7 @@ export default function PublicPortfolio() {
         twitter: 'Twitter',
         website: 'Website',
         instagram: 'Instagram',
+        email: 'Email',
     };
 
     const activeSocials = user.socialLinks
@@ -186,11 +189,14 @@ export default function PublicPortfolio() {
                         <div className="portfolio-social">
                             {activeSocials.map(([platform, url]) => {
                                 const Icon = socialIcons[platform] || Globe;
+                                const href = platform === 'email'
+                                    ? `mailto:${url}`
+                                    : (url.startsWith('http') ? url : `https://${url}`);
                                 return (
                                     <a
                                         key={platform}
-                                        href={url.startsWith('http') ? url : `https://${url}`}
-                                        target="_blank"
+                                        href={href}
+                                        target={platform === 'email' ? '_self' : '_blank'}
                                         rel="noopener noreferrer"
                                         title={socialLabels[platform] || platform}
                                     >
@@ -217,7 +223,15 @@ export default function PublicPortfolio() {
                                         fontWeight: 600,
                                     }}
                                 >
-                                    <LinkIcon size={14} />
+                                    {link.icon && link.icon.startsWith('data:image/svg') ? (
+                                        <img
+                                            src={link.icon}
+                                            alt=""
+                                            style={{ width: 14, height: 14, filter: 'brightness(0) invert(1)' }}
+                                        />
+                                    ) : (
+                                        <LinkIcon size={14} />
+                                    )}
                                     {link.label}
                                 </a>
                             ))}
