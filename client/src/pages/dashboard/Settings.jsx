@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import ImageCropper from '../../components/ImageCropper';
 import { Save, AlertCircle, CheckCircle, X, User, Plus, Trash2, Link as LinkIcon, Mail, Image } from 'lucide-react';
+import TechPicker from '../../components/TechPicker';
 
 export default function Settings() {
     const { user, apiFetch, updateUser } = useAuth();
@@ -20,7 +21,6 @@ export default function Settings() {
         },
         customSocialLinks: [],
     });
-    const [skillInput, setSkillInput] = useState('');
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -81,27 +81,7 @@ export default function Settings() {
         });
     };
 
-    const addSkill = () => {
-        const skill = skillInput.trim();
-        if (skill && !formData.skills.includes(skill)) {
-            setFormData({ ...formData, skills: [...formData.skills, skill] });
-        }
-        setSkillInput('');
-    };
 
-    const removeSkill = (skill) => {
-        setFormData({
-            ...formData,
-            skills: formData.skills.filter((s) => s !== skill),
-        });
-    };
-
-    const handleSkillKeyDown = (e) => {
-        if (e.key === 'Enter' || e.key === ',') {
-            e.preventDefault();
-            addSkill();
-        }
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -200,26 +180,11 @@ export default function Settings() {
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label">Skills</label>
-                        <div className="tag-input-container" onClick={() => document.getElementById('skill-input').focus()}>
-                            {formData.skills.map((skill) => (
-                                <span key={skill} className="tag-item">
-                                    {skill}
-                                    <button type="button" onClick={() => removeSkill(skill)}>
-                                        <X size={12} />
-                                    </button>
-                                </span>
-                            ))}
-                            <input
-                                id="skill-input"
-                                type="text"
-                                className="tag-input"
-                                placeholder={formData.skills.length === 0 ? 'Type and press Enter...' : ''}
-                                value={skillInput}
-                                onChange={(e) => setSkillInput(e.target.value)}
-                                onKeyDown={handleSkillKeyDown}
-                            />
-                        </div>
+                        <label className="form-label">Skills / Tech Stack</label>
+                        <TechPicker
+                            selected={formData.skills}
+                            onChange={(skills) => setFormData({ ...formData, skills })}
+                        />
                     </div>
 
                     {/* Social Links */}
