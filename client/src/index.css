@@ -2664,47 +2664,59 @@ button {
    Grouped Skills Display (Public Portfolio)
    ============================================ */
 .portfolio-skills-grouped {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
   margin: 24px auto;
-  max-width: 600px;
+  max-width: 800px;
   width: 100%;
   text-align: left;
+}
+
+@media (min-width: 900px) {
+  .portfolio-skills-grouped {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .portfolio-skills-grouped {
+    grid-template-columns: 1fr;
+  }
 }
 
 .skill-category-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 14px 18px;
+  padding: 12px 14px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
 }
 
 .skill-category-label {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--text-muted);
-  padding-bottom: 6px;
+  padding-bottom: 5px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .skill-category-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }
 
 .tech-badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
+  padding: 3px 9px;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   white-space: nowrap;
   transition: transform 0.15s ease, box-shadow 0.15s ease;

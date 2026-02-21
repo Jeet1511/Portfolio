@@ -391,22 +391,36 @@ export default function PublicPortfolio() {
                                 <p className="project-description">{selectedProject.description}</p>
                             )}
 
-                            {selectedProject.technologies && selectedProject.technologies.length > 0 && (
-                                <div className="project-tech">
-                                    {selectedProject.technologies.map((tech, i) => {
-                                        const info = getTechInfo(tech);
-                                        return (
-                                            <span
-                                                key={i}
-                                                className="tech-badge"
-                                                style={{ background: info.color, color: info.textColor }}
-                                            >
-                                                {info.name}
-                                            </span>
-                                        );
-                                    })}
-                                </div>
-                            )}
+                            {selectedProject.technologies && selectedProject.technologies.length > 0 && (() => {
+                                const grouped = {};
+                                selectedProject.technologies.forEach((tech) => {
+                                    const info = getTechInfo(tech);
+                                    if (!grouped[info.category]) grouped[info.category] = [];
+                                    grouped[info.category].push(info);
+                                });
+                                const categoryOrder = ['Languages', 'Frameworks', 'Databases', 'Cloud & DevOps', 'Tools', 'AI & Data', 'Other'];
+                                const sortedCategories = categoryOrder.filter(c => grouped[c]);
+                                return (
+                                    <div className="portfolio-skills-grouped" style={{ margin: '16px 0', maxWidth: '100%' }}>
+                                        {sortedCategories.map((category) => (
+                                            <div key={category} className="skill-category-section">
+                                                <span className="skill-category-label">{category}</span>
+                                                <div className="skill-category-badges">
+                                                    {grouped[category].map((info, i) => (
+                                                        <span
+                                                            key={i}
+                                                            className="tech-badge"
+                                                            style={{ background: info.color, color: info.textColor }}
+                                                        >
+                                                            {info.name}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                );
+                            })()}
 
                             <div className="project-actions">
                                 {selectedProject.liveUrl && (
