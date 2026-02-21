@@ -17,9 +17,21 @@ router.get('/:username', async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Increment profile views
-        user.profileViews += 1;
-        await user.save();
+        // Increment profile views atomically (skip for own profile)
+        const authHeader = req.headers.authorization;
+        let skipView = false;
+        if (authHeader) {
+            try {
+                const jwt = await import('jsonwebtoken');
+                const decoded = jwt.default.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
+                if (decoded.id && decoded.id.toString() === user._id.toString()) {
+                    skipView = true;
+                }
+            } catch { }
+        }
+        if (!skipView) {
+            await User.updateOne({ _id: user._id }, { $inc: { profileViews: 1 } });
+        }
 
         res.json({ user: user.toPublicJSON() });
     } catch (error) {
@@ -55,7 +67,7 @@ router.get('/:username/projects', async (req, res) => {
 // PUT /api/users/profile - Update own profile (auth required)
 router.put('/profile/update', protect, async (req, res) => {
     try {
-        const { displayName, bio, avatar, skills, socialLinks, customSocialLinks } = req.body;
+        const { displayName, bio, avatar, skills, socialLinks, customSocialLinks, backgroundStyle } = req.body;
 
         const user = await User.findById(req.user._id);
         if (!user) {
@@ -66,6 +78,7 @@ router.put('/profile/update', protect, async (req, res) => {
         if (bio !== undefined) user.bio = bio;
         if (avatar !== undefined) user.avatar = avatar;
         if (skills !== undefined) user.skills = skills;
+        if (backgroundStyle !== undefined) user.backgroundStyle = backgroundStyle;
         if (socialLinks !== undefined) {
             user.socialLinks = { ...user.socialLinks.toObject(), ...socialLinks };
         }

@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
     LayoutDashboard,
     FolderKanban,
@@ -7,12 +7,14 @@ import {
     BarChart3,
     Shield,
     ExternalLink,
+    Palette,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const userLinks = [
     { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
     { to: '/dashboard/projects', label: 'Projects', icon: FolderKanban },
+    { to: '/dashboard/background', label: 'Background', icon: Palette },
     { to: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -22,24 +24,28 @@ const adminLinks = [
     { to: '/admin/settings', label: 'Platform Settings', icon: Shield },
 ];
 
-export default function Sidebar({ type = 'user' }) {
+export default function Sidebar({ type = 'user', isOpen = false, onClose }) {
     const { user } = useAuth();
-    const location = useLocation();
     const links = type === 'admin' ? adminLinks : userLinks;
     const sectionTitle = type === 'admin' ? 'Administration' : 'Navigation';
 
+    const handleLinkClick = () => {
+        if (onClose) onClose();
+    };
+
     return (
-        <aside className="sidebar">
+        <aside className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
             <div className="sidebar-section">
                 <div className="sidebar-section-title">{sectionTitle}</div>
                 {links.map((link) => {
                     const Icon = link.icon;
-                    const isActive = location.pathname === link.to;
                     return (
                         <NavLink
                             key={link.to}
                             to={link.to}
-                            className={`sidebar-link ${isActive ? 'active' : ''}`}
+                            end
+                            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+                            onClick={handleLinkClick}
                         >
                             <Icon size={18} />
                             {link.label}
@@ -56,6 +62,7 @@ export default function Sidebar({ type = 'user' }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="sidebar-link"
+                        onClick={handleLinkClick}
                     >
                         <ExternalLink size={18} />
                         View Portfolio
@@ -66,7 +73,7 @@ export default function Sidebar({ type = 'user' }) {
             {type === 'admin' && (
                 <div className="sidebar-section">
                     <div className="sidebar-section-title">Switch</div>
-                    <NavLink to="/dashboard" className="sidebar-link">
+                    <NavLink to="/dashboard" className="sidebar-link" onClick={handleLinkClick}>
                         <LayoutDashboard size={18} />
                         User Dashboard
                     </NavLink>

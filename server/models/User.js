@@ -65,6 +65,11 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    backgroundStyle: {
+        type: String,
+        default: 'orbs',
+        enum: ['orbs', 'waves', 'matrix', 'constellation', 'gradientMesh', 'neonGrid', 'particleVortex', 'holographic', 'fireflies', 'none'],
+    },
     isActive: {
         type: Boolean,
         default: true,
@@ -92,6 +97,7 @@ userSchema.methods.toPublicJSON = function () {
         skills: this.skills,
         socialLinks: this.socialLinks,
         customSocialLinks: this.customSocialLinks || [],
+        backgroundStyle: this.backgroundStyle || 'orbs',
         profileViews: this.profileViews,
         createdAt: this.createdAt,
     };

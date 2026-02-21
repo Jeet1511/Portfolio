@@ -9,6 +9,7 @@ import Dashboard from './pages/dashboard/Dashboard';
 import Projects from './pages/dashboard/Projects';
 import EditProject from './pages/dashboard/EditProject';
 import Settings from './pages/dashboard/Settings';
+import Background from './pages/dashboard/Background';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
 import AdminSettings from './pages/admin/AdminSettings';
@@ -109,6 +110,13 @@ export default function App() {
                     <ProtectedRoute>
                         <DashboardLayout type="user">
                             <EditProject />
+                        </DashboardLayout>
+                    </ProtectedRoute>
+                } />
+                <Route path="/dashboard/background" element={
+                    <ProtectedRoute>
+                        <DashboardLayout type="user">
+                            <Background />
                         </DashboardLayout>
                     </ProtectedRoute>
                 } />

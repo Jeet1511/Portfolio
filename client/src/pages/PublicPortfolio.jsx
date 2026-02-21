@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getTechInfo } from '../data/techStack';
+import { backgroundComponents } from '../components/backgrounds';
 import {
     Github,
     Linkedin,
@@ -138,24 +139,12 @@ export default function PublicPortfolio() {
 
     return (
         <>
-            {/* Background Animations */}
-            <div className="portfolio-bg-container">
-                <div className="portfolio-bg-orb" />
-                <div className="portfolio-bg-orb" />
-                <div className="portfolio-bg-orb" />
-                <div className="portfolio-bg-orb" />
-                <div className="portfolio-bg-grid" />
-                <div className="portfolio-bg-particles">
-                    <div className="portfolio-bg-particle" />
-                    <div className="portfolio-bg-particle" />
-                    <div className="portfolio-bg-particle" />
-                    <div className="portfolio-bg-particle" />
-                    <div className="portfolio-bg-particle" />
-                    <div className="portfolio-bg-particle" />
-                    <div className="portfolio-bg-particle" />
-                    <div className="portfolio-bg-particle" />
-                </div>
-            </div>
+            {/* Background Animation */}
+            {(() => {
+                const bgKey = user.backgroundStyle || 'orbs';
+                const BgComponent = backgroundComponents[bgKey];
+                return BgComponent ? <BgComponent /> : null;
+            })()}
 
             <div className="portfolio-page">
                 {/* Profile Header */}
