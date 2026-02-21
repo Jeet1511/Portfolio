@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
     Github,
@@ -12,6 +12,8 @@ import {
     Star,
     UserX,
     Link as LinkIcon,
+    X,
+    Calendar,
 } from 'lucide-react';
 
 export default function PublicPortfolio() {
@@ -20,6 +22,8 @@ export default function PublicPortfolio() {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [selectedProject, setSelectedProject] = useState(null);
+    const [isClosing, setIsClosing] = useState(false);
 
     useEffect(() => {
         const fetchPortfolio = async () => {
@@ -47,6 +51,32 @@ export default function PublicPortfolio() {
 
         fetchPortfolio();
     }, [username]);
+
+    const openProject = (project) => {
+        setSelectedProject(project);
+        setIsClosing(false);
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeProject = useCallback(() => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setSelectedProject(null);
+            setIsClosing(false);
+            document.body.style.overflow = '';
+        }, 300);
+    }, []);
+
+    // Close on Escape key
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' && selectedProject) {
+                closeProject();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedProject, closeProject]);
 
     if (loading) {
         return (
@@ -92,6 +122,15 @@ export default function PublicPortfolio() {
         : [];
 
     const customLinks = user.customSocialLinks?.filter(l => l.label && l.url) || [];
+
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '';
+        return new Date(dateStr).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+    };
 
     return (
         <>
@@ -199,6 +238,7 @@ export default function PublicPortfolio() {
                                     key={project._id}
                                     className="project-card fade-in-up"
                                     style={{ animationDelay: `${index * 0.1}s` }}
+                                    onClick={() => openProject(project)}
                                 >
                                     <div className="project-image">
                                         {project.image ? (
@@ -222,36 +262,14 @@ export default function PublicPortfolio() {
 
                                         {project.technologies && project.technologies.length > 0 && (
                                             <div className="project-tech">
-                                                {project.technologies.map((tech, i) => (
+                                                {project.technologies.slice(0, 4).map((tech, i) => (
                                                     <span key={i} className="project-tech-tag">{tech}</span>
                                                 ))}
+                                                {project.technologies.length > 4 && (
+                                                    <span className="project-tech-tag">+{project.technologies.length - 4}</span>
+                                                )}
                                             </div>
                                         )}
-
-                                        <div className="project-actions">
-                                            {project.liveUrl && (
-                                                <a
-                                                    href={project.liveUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="btn btn-primary btn-sm"
-                                                >
-                                                    <ExternalLink size={14} />
-                                                    Live Demo
-                                                </a>
-                                            )}
-                                            {project.githubUrl && (
-                                                <a
-                                                    href={project.githubUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="btn btn-secondary btn-sm"
-                                                >
-                                                    <Github size={14} />
-                                                    Source
-                                                </a>
-                                            )}
-                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -265,6 +283,101 @@ export default function PublicPortfolio() {
                     )}
                 </div>
             </div>
+
+            {/* Project Detail Overlay */}
+            {selectedProject && (
+                <div
+                    className={`project-detail-overlay ${isClosing ? 'closing' : ''}`}
+                    onClick={closeProject}
+                >
+                    <div
+                        className="project-detail-card"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button className="project-detail-close" onClick={closeProject}>
+                            <X size={18} />
+                        </button>
+
+                        <div className="project-detail-image">
+                            {selectedProject.image ? (
+                                <img src={selectedProject.image} alt={selectedProject.title} />
+                            ) : (
+                                <Code2 size={60} className="placeholder-icon" />
+                            )}
+                            {selectedProject.featured && (
+                                <div className="project-featured-badge" style={{ top: 20, right: 60 }}>
+                                    <Star size={12} style={{ marginRight: 4 }} />
+                                    Featured
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="project-detail-body">
+                            <h3 className="project-title">{selectedProject.title}</h3>
+
+                            <div className="project-detail-meta">
+                                {selectedProject.createdAt && (
+                                    <span className="project-detail-meta-item">
+                                        <Calendar size={14} />
+                                        {formatDate(selectedProject.createdAt)}
+                                    </span>
+                                )}
+                                {selectedProject.status && (
+                                    <span className="project-detail-meta-item">
+                                        <span
+                                            style={{
+                                                width: 8,
+                                                height: 8,
+                                                borderRadius: '50%',
+                                                background: selectedProject.status === 'active' ? 'var(--success)' : 'var(--text-muted)',
+                                                display: 'inline-block',
+                                            }}
+                                        />
+                                        {selectedProject.status.charAt(0).toUpperCase() + selectedProject.status.slice(1)}
+                                    </span>
+                                )}
+                            </div>
+
+                            {selectedProject.description && (
+                                <p className="project-description">{selectedProject.description}</p>
+                            )}
+
+                            {selectedProject.technologies && selectedProject.technologies.length > 0 && (
+                                <div className="project-tech">
+                                    {selectedProject.technologies.map((tech, i) => (
+                                        <span key={i} className="project-tech-tag">{tech}</span>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="project-actions">
+                                {selectedProject.liveUrl && (
+                                    <a
+                                        href={selectedProject.liveUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-primary"
+                                    >
+                                        <ExternalLink size={16} />
+                                        Live Demo
+                                    </a>
+                                )}
+                                {selectedProject.githubUrl && (
+                                    <a
+                                        href={selectedProject.githubUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-secondary"
+                                    >
+                                        <Github size={16} />
+                                        View Source
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
