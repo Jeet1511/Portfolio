@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ImageCropper from '../../components/ImageCropper';
-import { Save, ArrowLeft, X, Plus, AlertCircle } from 'lucide-react';
+import TechPicker from '../../components/TechPicker';
+import { Save, ArrowLeft, AlertCircle } from 'lucide-react';
 
 export default function EditProject() {
     const { id } = useParams();
@@ -20,7 +21,6 @@ export default function EditProject() {
         featured: false,
         status: 'active',
     });
-    const [techInput, setTechInput] = useState('');
     const [loading, setLoading] = useState(!isNew);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -61,32 +61,8 @@ export default function EditProject() {
         });
     };
 
-    const addTech = () => {
-        const tech = techInput.trim();
-        if (tech && !formData.technologies.includes(tech)) {
-            setFormData({
-                ...formData,
-                technologies: [...formData.technologies, tech],
-            });
-        }
-        setTechInput('');
-    };
-
-    const removeTech = (tech) => {
-        setFormData({
-            ...formData,
-            technologies: formData.technologies.filter((t) => t !== tech),
-        });
-    };
-
-    const handleTechKeyDown = (e) => {
-        if (e.key === 'Enter' || e.key === ',') {
-            e.preventDefault();
-            addTech();
-        }
-        if (e.key === 'Backspace' && !techInput && formData.technologies.length > 0) {
-            removeTech(formData.technologies[formData.technologies.length - 1]);
-        }
+    const handleTechChange = (techs) => {
+        setFormData({ ...formData, technologies: techs });
     };
 
     const handleImageCropped = (url) => {
@@ -186,26 +162,10 @@ export default function EditProject() {
 
                     <div className="form-group">
                         <label className="form-label">Technologies</label>
-                        <div className="tag-input-container" onClick={() => document.getElementById('tech-input').focus()}>
-                            {formData.technologies.map((tech) => (
-                                <span key={tech} className="tag-item">
-                                    {tech}
-                                    <button type="button" onClick={() => removeTech(tech)}>
-                                        <X size={12} />
-                                    </button>
-                                </span>
-                            ))}
-                            <input
-                                id="tech-input"
-                                type="text"
-                                className="tag-input"
-                                placeholder={formData.technologies.length === 0 ? 'Type and press Enter...' : ''}
-                                value={techInput}
-                                onChange={(e) => setTechInput(e.target.value)}
-                                onKeyDown={handleTechKeyDown}
-                            />
-                        </div>
-                        <p className="form-hint">Press Enter or comma to add a technology tag</p>
+                        <TechPicker
+                            selected={formData.technologies}
+                            onChange={handleTechChange}
+                        />
                     </div>
 
                     {/* Image Upload with Crop */}

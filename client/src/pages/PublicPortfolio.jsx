@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { getTechInfo } from '../data/techStack';
 import {
     Github,
     Linkedin,
@@ -262,9 +263,18 @@ export default function PublicPortfolio() {
 
                                         {project.technologies && project.technologies.length > 0 && (
                                             <div className="project-tech">
-                                                {project.technologies.slice(0, 4).map((tech, i) => (
-                                                    <span key={i} className="project-tech-tag">{tech}</span>
-                                                ))}
+                                                {project.technologies.slice(0, 4).map((tech, i) => {
+                                                    const info = getTechInfo(tech);
+                                                    return (
+                                                        <span
+                                                            key={i}
+                                                            className="tech-badge"
+                                                            style={{ background: info.color, color: info.textColor, fontSize: '0.7rem', padding: '3px 8px' }}
+                                                        >
+                                                            {info.name}
+                                                        </span>
+                                                    );
+                                                })}
                                                 {project.technologies.length > 4 && (
                                                     <span className="project-tech-tag">+{project.technologies.length - 4}</span>
                                                 )}
@@ -344,9 +354,18 @@ export default function PublicPortfolio() {
 
                             {selectedProject.technologies && selectedProject.technologies.length > 0 && (
                                 <div className="project-tech">
-                                    {selectedProject.technologies.map((tech, i) => (
-                                        <span key={i} className="project-tech-tag">{tech}</span>
-                                    ))}
+                                    {selectedProject.technologies.map((tech, i) => {
+                                        const info = getTechInfo(tech);
+                                        return (
+                                            <span
+                                                key={i}
+                                                className="tech-badge"
+                                                style={{ background: info.color, color: info.textColor }}
+                                            >
+                                                {info.name}
+                                            </span>
+                                        );
+                                    })}
                                 </div>
                             )}
 
