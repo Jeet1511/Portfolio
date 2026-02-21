@@ -58,7 +58,7 @@ const userSchema = new mongoose.Schema({
     },
     customSocialLinks: [{
         label: { type: String, required: true, maxlength: 50 },
-        url: { type: String, required: true },
+        url: { type: String, default: '' },
         icon: { type: String, default: '' },
     }],
     profileViews: {

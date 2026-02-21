@@ -179,9 +179,18 @@ export default function PublicPortfolio() {
 
                     {user.skills && user.skills.length > 0 && (
                         <div className="portfolio-skills">
-                            {user.skills.map((skill, i) => (
-                                <span key={i} className="badge badge-primary">{skill}</span>
-                            ))}
+                            {user.skills.map((skill, i) => {
+                                const info = getTechInfo(skill);
+                                return (
+                                    <span
+                                        key={i}
+                                        className="tech-badge"
+                                        style={{ background: info.color, color: info.textColor }}
+                                    >
+                                        {info.name}
+                                    </span>
+                                );
+                            })}
                         </div>
                     )}
 

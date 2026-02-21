@@ -70,7 +70,7 @@ router.put('/profile/update', protect, async (req, res) => {
             user.socialLinks = { ...user.socialLinks.toObject(), ...socialLinks };
         }
         if (customSocialLinks !== undefined) {
-            user.customSocialLinks = customSocialLinks.filter(l => l.label && l.url);
+            user.customSocialLinks = customSocialLinks.filter(l => l.label);
         }
 
         await user.save();

@@ -239,7 +239,7 @@ export default function Settings() {
                             <div className="form-group" key={social.key}>
                                 <label className="form-label">{social.label}</label>
                                 <input
-                                    type={social.key === 'email' ? 'email' : 'url'}
+                                    type="text"
                                     className="form-input"
                                     placeholder={social.placeholder}
                                     value={formData.socialLinks[social.key]}
@@ -281,7 +281,7 @@ export default function Settings() {
                                         />
                                     </div>
                                     <input
-                                        type="url"
+                                        type="text"
                                         className="form-input"
                                         placeholder="https://dribbble.com/username"
                                         value={link.url}
