@@ -177,22 +177,38 @@ export default function PublicPortfolio() {
 
                     {user.bio && <p className="portfolio-bio">{user.bio}</p>}
 
-                    {user.skills && user.skills.length > 0 && (
-                        <div className="portfolio-skills">
-                            {user.skills.map((skill, i) => {
-                                const info = getTechInfo(skill);
-                                return (
-                                    <span
-                                        key={i}
-                                        className="tech-badge"
-                                        style={{ background: info.color, color: info.textColor }}
-                                    >
-                                        {info.name}
-                                    </span>
-                                );
-                            })}
-                        </div>
-                    )}
+                    {user.skills && user.skills.length > 0 && (() => {
+                        // Group skills by category
+                        const grouped = {};
+                        user.skills.forEach((skill) => {
+                            const info = getTechInfo(skill);
+                            if (!grouped[info.category]) grouped[info.category] = [];
+                            grouped[info.category].push(info);
+                        });
+                        // Define category order
+                        const categoryOrder = ['Languages', 'Frameworks', 'Databases', 'Cloud & DevOps', 'Tools', 'AI & Data', 'Other'];
+                        const sortedCategories = categoryOrder.filter(c => grouped[c]);
+                        return (
+                            <div className="portfolio-skills-grouped">
+                                {sortedCategories.map((category) => (
+                                    <div key={category} className="skill-category-section">
+                                        <span className="skill-category-label">{category}</span>
+                                        <div className="skill-category-badges">
+                                            {grouped[category].map((info, i) => (
+                                                <span
+                                                    key={i}
+                                                    className="tech-badge"
+                                                    style={{ background: info.color, color: info.textColor }}
+                                                >
+                                                    {info.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    })()}
 
                     {(activeSocials.length > 0 || customLinks.length > 0) && (
                         <div className="portfolio-social">
