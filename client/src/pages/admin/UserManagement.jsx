@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAdminAuth } from '../../context/AdminAuthContext';
-import { Search, Trash2, ToggleLeft, ToggleRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Trash2, ToggleLeft, ToggleRight, ChevronLeft, ChevronRight, Ban } from 'lucide-react';
 
 export default function UserManagement() {
     const { adminFetch, isSuperAdmin } = useAdminAuth();
@@ -49,6 +49,16 @@ export default function UserManagement() {
         } catch (err) { alert(err.message); }
     };
 
+    const handleBan = async (userId, username) => {
+        if (!isSuperAdmin) return alert('Only Super Admin can ban users');
+        if (!confirm(`Ban @${username}? This will deactivate their account AND delete ALL their projects permanently.`)) return;
+        try {
+            const result = await adminFetch(`/users/${userId}/ban`, { method: 'PUT' });
+            alert(result.message);
+            fetchUsers();
+        } catch (err) { alert(err.message); }
+    };
+
     return (
         <div className="admin-page">
             <div className="admin-page-header">
@@ -65,7 +75,7 @@ export default function UserManagement() {
                 <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}>
                     <option value="">All Status</option>
                     <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="inactive">Inactive / Banned</option>
                 </select>
             </div>
 
@@ -91,13 +101,18 @@ export default function UserManagement() {
                                         <td><strong>@{u.username}</strong><br /><span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{u.displayName}</span></td>
                                         <td>{u.email}</td>
                                         <td>{u.projectCount}</td>
-                                        <td><span className={`admin-badge ${u.isActive !== false ? 'active' : 'inactive'}`}>{u.isActive !== false ? 'Active' : 'Inactive'}</span></td>
+                                        <td><span className={`admin-badge ${u.isActive !== false ? 'active' : 'inactive'}`}>{u.isActive !== false ? 'Active' : 'Banned'}</span></td>
                                         <td>{new Date(u.createdAt).toLocaleDateString()}</td>
                                         <td>
                                             <div className="admin-action-btns">
                                                 <button onClick={() => handleToggle(u._id)} title={u.isActive !== false ? 'Deactivate' : 'Activate'} className="admin-action-btn">
                                                     {u.isActive !== false ? <ToggleRight size={18} className="text-success" /> : <ToggleLeft size={18} />}
                                                 </button>
+                                                {isSuperAdmin && u.isActive !== false && (
+                                                    <button onClick={() => handleBan(u._id, u.username)} title="Ban user + delete all content" className="admin-action-btn danger">
+                                                        <Ban size={16} />
+                                                    </button>
+                                                )}
                                                 {isSuperAdmin && (
                                                     <button onClick={() => handleDelete(u._id, u.displayName)} title="Delete" className="admin-action-btn danger">
                                                         <Trash2 size={16} />

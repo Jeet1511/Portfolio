@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import Admin from '../models/Admin.js';
 import User from '../models/User.js';
 import Project from '../models/Project.js';
+import ActivityLog from '../models/ActivityLog.js';
 import { adminProtect, superAdminOnly } from '../middleware/adminAuth.js';
 import os from 'os';
 
@@ -11,6 +12,22 @@ const router = express.Router();
 // Helper: generate admin JWT
 function generateAdminToken(adminId) {
     return jwt.sign({ id: adminId }, process.env.JWT_SECRET + '_admin', { expiresIn: '8h' });
+}
+
+// Helper: log admin activity
+async function logActivity(admin, action, targetType, targetId, targetName, details, ip) {
+    try {
+        await ActivityLog.create({
+            action,
+            performedBy: admin._id || admin.id,
+            performedByName: admin.displayName || admin.email,
+            targetType: targetType || 'system',
+            targetId: targetId || null,
+            targetName: targetName || '',
+            details: details || '',
+            ip: ip || '',
+        });
+    } catch (e) { /* silent */ }
 }
 
 // ==============================
@@ -43,6 +60,9 @@ router.post('/login', async (req, res) => {
         await admin.save();
 
         const token = generateAdminToken(admin._id);
+
+        // Log login activity
+        await logActivity(admin, 'admin_login', 'admin', admin._id, admin.displayName, 'Admin panel login', req.ip);
 
         res.json({
             token,
@@ -194,6 +214,9 @@ router.delete('/users/:id', adminProtect, superAdminOnly, async (req, res) => {
 
         await Project.deleteMany({ userId: user._id });
         await User.findByIdAndDelete(req.params.id);
+
+        await logActivity(req.admin, 'user_deleted', 'user', user._id, user.username, `Deleted user @${user.username} and all projects`, req.ip);
+
         res.json({ message: 'User deleted' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -208,6 +231,9 @@ router.put('/users/:id/toggle', adminProtect, async (req, res) => {
 
         user.isActive = !user.isActive;
         await user.save();
+
+        await logActivity(req.admin, 'user_toggled', 'user', user._id, user.username, `${user.isActive ? 'Activated' : 'Deactivated'} user @${user.username}`, req.ip);
+
         res.json({ user: { ...user.toObject(), password: undefined } });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -252,6 +278,9 @@ router.post('/admins', adminProtect, superAdminOnly, async (req, res) => {
         });
 
         await admin.save();
+
+        await logActivity(req.admin, 'admin_created', 'admin', admin._id, admin.displayName, `Created admin ${admin.email}`, req.ip);
+
         res.status(201).json({
             admin: {
                 id: admin._id,
@@ -396,6 +425,192 @@ router.get('/analytics', adminProtect, async (req, res) => {
             topUsers: topUsers.slice(0, 10),
             totalProjects: await Project.countDocuments(),
             totalUsers: await User.countDocuments(),
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==============================
+// PASSWORD CHANGE
+// ==============================
+
+// PUT /api/admin-auth/change-password
+router.put('/change-password', adminProtect, async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ message: 'Current and new password required' });
+        }
+        if (newPassword.length < 6) {
+            return res.status(400).json({ message: 'New password must be at least 6 characters' });
+        }
+
+        const admin = await Admin.findById(req.admin._id);
+        const isMatch = await admin.comparePassword(currentPassword);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Current password is incorrect' });
+        }
+
+        admin.password = newPassword;
+        await admin.save();
+
+        await logActivity(req.admin, 'password_changed', 'admin', req.admin._id, req.admin.displayName, 'Password changed', req.ip);
+
+        res.json({ message: 'Password changed successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==============================
+// CONTENT MODERATION
+// ==============================
+
+// GET /api/admin-auth/content - List all projects for moderation
+router.get('/content', adminProtect, async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const search = req.query.search || '';
+
+        let query = {};
+        if (search) {
+            query.$or = [
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } },
+            ];
+        }
+
+        const total = await Project.countDocuments(query);
+        const projects = await Project.find(query)
+            .populate('userId', 'username displayName email isActive')
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        res.json({
+            projects: projects.map(p => ({
+                id: p._id,
+                title: p.title,
+                description: p.description,
+                image: p.image,
+                liveUrl: p.liveUrl,
+                githubUrl: p.githubUrl,
+                technologies: p.technologies,
+                status: p.status,
+                featured: p.featured,
+                createdAt: p.createdAt,
+                owner: p.userId ? {
+                    id: p.userId._id,
+                    username: p.userId.username,
+                    displayName: p.userId.displayName,
+                    email: p.userId.email,
+                    isActive: p.userId.isActive,
+                } : null,
+            })),
+            pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+        });
+    } catch (error) {
+        console.error('Content moderation error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// DELETE /api/admin-auth/content/:id - Remove a project
+router.delete('/content/:id', adminProtect, async (req, res) => {
+    try {
+        const project = await Project.findById(req.params.id).populate('userId', 'username displayName');
+        if (!project) return res.status(404).json({ message: 'Project not found' });
+
+        const ownerName = project.userId?.username || 'unknown';
+        await Project.findByIdAndDelete(req.params.id);
+
+        await logActivity(req.admin, 'content_removed', 'project', project._id, project.title, `Removed project "${project.title}" by @${ownerName}`, req.ip);
+
+        res.json({ message: 'Project removed' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// PUT /api/admin-auth/users/:id/ban - Ban user + remove all content
+router.put('/users/:id/ban', adminProtect, superAdminOnly, async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // Deactivate user
+        user.isActive = false;
+        await user.save();
+
+        // Remove all their projects
+        const deletedCount = await Project.countDocuments({ userId: user._id });
+        await Project.deleteMany({ userId: user._id });
+
+        await logActivity(req.admin, 'user_banned', 'user', user._id, user.username, `Banned @${user.username} and removed ${deletedCount} projects`, req.ip);
+
+        res.json({ message: `User @${user.username} banned. ${deletedCount} projects removed.` });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==============================
+// ACTIVITY LOGS
+// ==============================
+
+// GET /api/admin-auth/activity-logs
+router.get('/activity-logs', adminProtect, async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 50;
+        const action = req.query.action || '';
+
+        let query = {};
+        if (action) query.action = action;
+
+        const total = await ActivityLog.countDocuments(query);
+        const logs = await ActivityLog.find(query)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        res.json({
+            logs,
+            pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==============================
+// SECURITY - LOGIN ATTEMPTS & BANNED USERS
+// ==============================
+
+// GET /api/admin-auth/security
+router.get('/security', adminProtect, async (req, res) => {
+    try {
+        // Recent login activity from activity logs
+        const loginLogs = await ActivityLog.find({ action: 'admin_login' })
+            .sort({ createdAt: -1 })
+            .limit(20);
+
+        // Banned/inactive users
+        const bannedUsers = await User.find({ isActive: false })
+            .select('username displayName email updatedAt')
+            .sort({ updatedAt: -1 });
+
+        // Recent bans from activity logs
+        const banLogs = await ActivityLog.find({ action: 'user_banned' })
+            .sort({ createdAt: -1 })
+            .limit(20);
+
+        res.json({
+            loginLogs,
+            bannedUsers,
+            banLogs,
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

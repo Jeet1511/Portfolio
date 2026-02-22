@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { Settings, Save, ToggleLeft, ToggleRight } from 'lucide-react';
+import { useAdminAuth } from '../../context/AdminAuthContext';
+import { Save, ToggleLeft, ToggleRight, Key, CheckCircle } from 'lucide-react';
 
 export default function SiteSettings() {
+    const { adminFetch, admin } = useAdminAuth();
     const [settings, setSettings] = useState({
         siteName: 'EvoQ',
         siteDescription: 'Professional Portfolio Platform',
@@ -15,6 +17,12 @@ export default function SiteSettings() {
         autoApproveProjects: true,
     });
 
+    // Password change state
+    const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    const [passwordMsg, setPasswordMsg] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [changingPassword, setChangingPassword] = useState(false);
+
     const toggleSetting = (key) => {
         setSettings(s => ({ ...s, [key]: !s[key] }));
     };
@@ -23,14 +31,83 @@ export default function SiteSettings() {
         alert('Settings saved successfully!');
     };
 
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        setPasswordMsg('');
+        setPasswordError('');
+
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+            setPasswordError('New passwords do not match');
+            return;
+        }
+        if (passwordForm.newPassword.length < 6) {
+            setPasswordError('Password must be at least 6 characters');
+            return;
+        }
+
+        setChangingPassword(true);
+        try {
+            const result = await adminFetch('/change-password', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    currentPassword: passwordForm.currentPassword,
+                    newPassword: passwordForm.newPassword,
+                }),
+            });
+            setPasswordMsg(result.message);
+            setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        } catch (err) {
+            setPasswordError(err.message);
+        } finally {
+            setChangingPassword(false);
+        }
+    };
+
     return (
         <div className="admin-page">
             <div className="admin-page-header">
                 <h1>Site Settings</h1>
-                <p>Platform configuration and defaults</p>
-                <button className="admin-primary-btn" onClick={handleSave}><Save size={16} /> Save Changes</button>
+                <p>Platform configuration, defaults, and account security</p>
             </div>
 
+            {/* Password Change Section */}
+            <div className="admin-section">
+                <h2><Key size={18} /> Change Password</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: 16 }}>
+                    Logged in as <strong>{admin?.email}</strong> ({admin?.role?.replace('_', ' ')})
+                </p>
+
+                {passwordMsg && (
+                    <div style={{ background: 'rgba(0,184,148,0.1)', border: '1px solid rgba(0,184,148,0.3)', color: '#00b894', padding: '10px 14px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <CheckCircle size={16} /> {passwordMsg}
+                    </div>
+                )}
+                {passwordError && (
+                    <div style={{ background: 'rgba(255,118,117,0.1)', border: '1px solid rgba(255,118,117,0.3)', color: '#ff7675', padding: '10px 14px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 16 }}>
+                        {passwordError}
+                    </div>
+                )}
+
+                <form onSubmit={handlePasswordChange} style={{ maxWidth: 400 }}>
+                    <div className="admin-form-group">
+                        <label>Current Password</label>
+                        <input type="password" value={passwordForm.currentPassword} onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })} required />
+                    </div>
+                    <div className="admin-form-group">
+                        <label>New Password</label>
+                        <input type="password" value={passwordForm.newPassword} onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })} required />
+                    </div>
+                    <div className="admin-form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" value={passwordForm.confirmPassword} onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })} required />
+                    </div>
+                    <button type="submit" className="admin-primary-btn" disabled={changingPassword}>
+                        <Key size={16} /> {changingPassword ? 'Changing...' : 'Change Password'}
+                    </button>
+                </form>
+            </div>
+
+            {/* General Settings */}
             <div className="admin-section">
                 <h2>General</h2>
                 <div className="admin-settings-list">
@@ -51,6 +128,7 @@ export default function SiteSettings() {
                 </div>
             </div>
 
+            {/* Limits */}
             <div className="admin-section">
                 <h2>Limits</h2>
                 <div className="admin-settings-list">
@@ -65,15 +143,16 @@ export default function SiteSettings() {
                 </div>
             </div>
 
+            {/* Toggles */}
             <div className="admin-section">
-                <h2>Toggles</h2>
+                <h2>Feature Toggles</h2>
                 <div className="admin-settings-list">
                     {[
                         { key: 'maintenanceMode', label: 'Maintenance Mode', desc: 'Disable public access during maintenance' },
                         { key: 'registrationEnabled', label: 'User Registration', desc: 'Allow new users to sign up' },
                         { key: 'analyticsEnabled', label: 'Analytics', desc: 'Collect usage analytics' },
                         { key: 'emailNotifications', label: 'Email Notifications', desc: 'Send email notifications to users' },
-                        { key: 'autoApproveProjects', label: 'Auto-approve Projects', desc: 'Projects go live immediately' },
+                        { key: 'autoApproveProjects', label: 'Auto-approve Projects', desc: 'Projects go live immediately (users upload freely)' },
                     ].map(item => (
                         <div className="admin-setting-item" key={item.key}>
                             <div><strong>{item.label}</strong><p>{item.desc}</p></div>
@@ -83,6 +162,10 @@ export default function SiteSettings() {
                         </div>
                     ))}
                 </div>
+            </div>
+
+            <div style={{ marginTop: 16 }}>
+                <button className="admin-primary-btn" onClick={handleSave}><Save size={16} /> Save All Settings</button>
             </div>
         </div>
     );
