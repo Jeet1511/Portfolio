@@ -43,7 +43,7 @@ export default function Signup() {
             <div className="auth-card">
                 <div className="auth-header">
                     <h1>Create Account</h1>
-                    <p>Join FolioX and build your professional portfolio</p>
+                    <p>Join EvoQ and build your professional portfolio</p>
                 </div>
 
                 {error && (
@@ -90,7 +90,7 @@ export default function Signup() {
                             {formData.username && isUsernameValid && (
                                 <CheckCircle size={12} style={{ color: 'var(--success)' }} />
                             )}
-                            Your portfolio URL: foliox.com/{formData.username || 'username'}
+                            Your portfolio URL: evoq.com/{formData.username || 'username'}
                         </div>
                     </div>
 

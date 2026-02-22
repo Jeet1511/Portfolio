@@ -21,7 +21,7 @@ export default function AdminSettings() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                         <div className="flex justify-between">
                             <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Platform</span>
-                            <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>FolioX v1.0.0</span>
+                            <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>EvoQ v1.0.0</span>
                         </div>
                         <div className="flex justify-between">
                             <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Runtime</span>

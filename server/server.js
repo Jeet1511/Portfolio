@@ -9,7 +9,9 @@ import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import projectRoutes from './routes/projects.js';
 import adminRoutes from './routes/admin.js';
+import adminAuthRoutes from './routes/adminAuth.js';
 import uploadRoutes from './routes/upload.js';
+import { seedSuperAdmin } from './seedAdmin.js';
 
 dotenv.config();
 
@@ -29,6 +31,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin-auth', adminAuthRoutes);
 app.use('/api/upload', uploadRoutes);
 
 // Serve uploads
@@ -47,14 +50,15 @@ app.get('*', (req, res) => {
 const startServer = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URI);
-        console.log('[FolioX] Connected to MongoDB');
+        console.log('[EvoQ] Connected to MongoDB');
+        await seedSuperAdmin();
     } catch (error) {
-        console.warn('[FolioX] MongoDB connection failed:', error.message);
-        console.warn('[FolioX] Running without database - some features will not work');
+        console.warn('[EvoQ] MongoDB connection failed:', error.message);
+        console.warn('[EvoQ] Running without database - some features will not work');
     }
 
     app.listen(PORT, () => {
-        console.log(`[FolioX] Server running on port ${PORT}`);
+        console.log(`[EvoQ] Server running on port ${PORT}`);
     });
 };
 

@@ -7,6 +7,11 @@ import NeonGridBackground from './NeonGridBackground';
 import ParticleVortexBackground from './ParticleVortexBackground';
 import HolographicBackground from './HolographicBackground';
 import FirefliesBackground from './FirefliesBackground';
+import PlasmaBackground from './PlasmaBackground';
+import DigitalRainBackground from './DigitalRainBackground';
+import NebulaBackground from './NebulaBackground';
+import LightningBackground from './LightningBackground';
+import StarfieldWarpBackground from './StarfieldWarpBackground';
 
 export const backgroundComponents = {
     orbs: OrbsBackground,
@@ -18,6 +23,11 @@ export const backgroundComponents = {
     particleVortex: ParticleVortexBackground,
     holographic: HolographicBackground,
     fireflies: FirefliesBackground,
+    plasma: PlasmaBackground,
+    digitalRain: DigitalRainBackground,
+    nebula: NebulaBackground,
+    lightning: LightningBackground,
+    starfieldWarp: StarfieldWarpBackground,
 };
 
 export const backgroundList = [
@@ -65,6 +75,31 @@ export const backgroundList = [
         id: 'fireflies',
         name: 'Fireflies',
         description: 'Warm amber-gold glowing dots drifting gently like fireflies',
+    },
+    {
+        id: 'plasma',
+        name: 'Plasma Field',
+        description: 'Organic flowing plasma interference patterns in deep violet',
+    },
+    {
+        id: 'digitalRain',
+        name: 'Digital Rain',
+        description: 'Purple Matrix-style falling katakana characters with glow',
+    },
+    {
+        id: 'nebula',
+        name: 'Deep Nebula',
+        description: 'Cosmic nebula clouds with twinkling stars and drifting gas',
+    },
+    {
+        id: 'lightning',
+        name: 'Electric Storm',
+        description: 'Dramatic lightning bolts with branching, glow, and flash effects',
+    },
+    {
+        id: 'starfieldWarp',
+        name: 'Starfield Warp',
+        description: 'Hyperspace warp drive with stars streaking from the center',
     },
     {
         id: 'none',

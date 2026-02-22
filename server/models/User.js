@@ -68,7 +68,7 @@ const userSchema = new mongoose.Schema({
     backgroundStyle: {
         type: String,
         default: 'orbs',
-        enum: ['orbs', 'waves', 'matrix', 'constellation', 'gradientMesh', 'neonGrid', 'particleVortex', 'holographic', 'fireflies', 'none'],
+        enum: ['orbs', 'waves', 'matrix', 'constellation', 'gradientMesh', 'neonGrid', 'particleVortex', 'holographic', 'fireflies', 'plasma', 'digitalRain', 'nebula', 'lightning', 'starfieldWarp', 'none'],
     },
     isActive: {
         type: Boolean,

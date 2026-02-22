@@ -188,7 +188,7 @@ export default function ImageCropper({ onImageCropped, currentImage, label = 'Up
             const formData = new FormData();
             formData.append('image', blob, 'cropped-image.jpg');
 
-            const token = localStorage.getItem('foliox_token');
+            const token = localStorage.getItem('evoq_token');
             const res = await fetch('/api/upload', {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },

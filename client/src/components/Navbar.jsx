@@ -1,95 +1,98 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, LogOut, LogIn, UserPlus, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import {
+    LayoutDashboard, LogOut, LogIn, UserPlus,
+    Home, Eye, User,
+} from 'lucide-react';
 
 export default function Navbar() {
-    const { user, isAuthenticated, isAdmin, logout } = useAuth();
+    const { user, isAuthenticated, logout } = useAuth();
     const location = useLocation();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const closeMobile = () => setMobileMenuOpen(false);
+    // Build nav items for reuse in both top and bottom bars
+    const navItems = [
+        { to: '/', icon: Home, label: 'Home', active: location.pathname === '/' },
+    ];
+
+    if (isAuthenticated) {
+        navItems.push(
+            { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', active: location.pathname.startsWith('/dashboard') },
+            { to: `/${user?.username}`, icon: Eye, label: 'Portfolio', active: location.pathname === `/${user?.username}` },
+        );
+    }
 
     return (
-        <nav className="navbar">
-            <Link to="/" className="navbar-logo">
-                Folio<span className="logo-accent">X</span>
-            </Link>
+        <>
+            {/* Top navbar - always visible */}
+            <nav className="navbar">
+                <Link to="/" className="navbar-logo">
+                    Evo<span className="logo-accent">Q</span>
+                </Link>
 
-            <button
-                className="navbar-hamburger"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Toggle menu"
-            >
-                {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
-
-            <div className={`navbar-menu ${mobileMenuOpen ? 'open' : ''}`}>
-                <div className="navbar-links">
-                    <Link
-                        to="/"
-                        className={`navbar-link ${location.pathname === '/' ? 'active' : ''}`}
-                        onClick={closeMobile}
-                    >
-                        Home
-                    </Link>
-                    {isAuthenticated && (
+                {/* Desktop links - hidden on mobile via CSS */}
+                <div className="navbar-links desktop-only">
+                    {navItems.map((item) => (
                         <Link
-                            to={`/${user.username}`}
-                            className={`navbar-link ${location.pathname === `/${user.username}` ? 'active' : ''}`}
-                            onClick={closeMobile}
+                            key={item.to}
+                            to={item.to}
+                            className={`navbar-link ${item.active ? 'active' : ''}`}
                         >
-                            My Portfolio
+                            <item.icon size={16} />
+                            <span>{item.label}</span>
                         </Link>
-                    )}
-                    {isAuthenticated && (
-                        <Link
-                            to="/dashboard"
-                            className={`navbar-link ${location.pathname.startsWith('/dashboard') ? 'active' : ''}`}
-                            onClick={closeMobile}
-                        >
-                            Dashboard
-                        </Link>
-                    )}
+                    ))}
                 </div>
 
                 <div className="navbar-actions">
                     {isAuthenticated ? (
                         <>
-                            {isAdmin && (
-                                <Link to="/admin" className="btn btn-ghost btn-sm" onClick={closeMobile}>
-                                    <LayoutDashboard size={16} />
-                                    Admin
-                                </Link>
-                            )}
                             <div className="navbar-user">
                                 <div className="navbar-avatar">
-                                    {user.displayName?.charAt(0).toUpperCase()}
+                                    {user?.displayName?.charAt(0).toUpperCase()}
                                 </div>
-                                <span style={{ fontSize: '0.88rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
-                                    {user.displayName}
-                                </span>
+                                <span className="navbar-username">{user?.displayName}</span>
                             </div>
-                            <button className="btn btn-ghost btn-icon" onClick={() => { logout(); closeMobile(); }} title="Sign Out">
+                            <button className="btn btn-ghost btn-icon" onClick={logout} title="Sign Out">
                                 <LogOut size={18} />
                             </button>
                         </>
                     ) : (
                         <>
-                            <Link to="/login" className="btn btn-ghost btn-sm" onClick={closeMobile}>
+                            <Link to="/login" className="btn btn-ghost btn-sm">
                                 <LogIn size={16} />
-                                Sign In
+                                <span>Sign In</span>
                             </Link>
-                            <Link to="/signup" className="btn btn-primary btn-sm" onClick={closeMobile}>
+                            <Link to="/signup" className="btn btn-primary btn-sm">
                                 <UserPlus size={16} />
-                                Get Started
+                                <span>Get Started</span>
                             </Link>
                         </>
                     )}
                 </div>
-            </div>
+            </nav>
 
-            {mobileMenuOpen && <div className="navbar-overlay" onClick={closeMobile} />}
-        </nav>
+            {/* Mobile bottom nav - only visible on mobile */}
+            <div className="mobile-bottom-nav">
+                {navItems.map((item) => (
+                    <Link
+                        key={item.to}
+                        to={item.to}
+                        className={`bottom-nav-item ${item.active ? 'active' : ''}`}
+                    >
+                        <item.icon size={20} />
+                        <span>{item.label}</span>
+                    </Link>
+                ))}
+                {isAuthenticated && (
+                    <Link
+                        to="/dashboard/settings"
+                        className={`bottom-nav-item ${location.pathname === '/dashboard/settings' ? 'active' : ''}`}
+                    >
+                        <User size={20} />
+                        <span>Profile</span>
+                    </Link>
+                )}
+            </div>
+        </>
     );
 }

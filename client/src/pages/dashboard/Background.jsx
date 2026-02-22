@@ -119,6 +119,74 @@ const previewRenderers = {
             ))}
         </div>
     ),
+    plasma: (
+        <div className="bg-preview-scene bg-preview-plasma">
+            <div className="preview-plasma-wave preview-plasma-wave-1" />
+            <div className="preview-plasma-wave preview-plasma-wave-2" />
+            <div className="preview-plasma-wave preview-plasma-wave-3" />
+        </div>
+    ),
+    digitalRain: (
+        <div className="bg-preview-scene bg-preview-digital-rain">
+            {Array.from({ length: 10 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-rain-col"
+                    style={{
+                        left: `${5 + i * 10}%`,
+                        animationDelay: `${i * 0.2}s`,
+                        height: `${30 + Math.random() * 60}%`,
+                    }}
+                />
+            ))}
+        </div>
+    ),
+    nebula: (
+        <div className="bg-preview-scene bg-preview-nebula">
+            <div className="preview-nebula-cloud preview-nebula-cloud-1" />
+            <div className="preview-nebula-cloud preview-nebula-cloud-2" />
+            {Array.from({ length: 20 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-nebula-star"
+                    style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                        animationDelay: `${i * 0.3}s`,
+                        width: `${1 + Math.random() * 2}px`,
+                        height: `${1 + Math.random() * 2}px`,
+                    }}
+                />
+            ))}
+        </div>
+    ),
+    lightning: (
+        <div className="bg-preview-scene bg-preview-lightning">
+            <div className="preview-bolt preview-bolt-1" />
+            <div className="preview-bolt preview-bolt-2" />
+            <div className="preview-lightning-flash" />
+        </div>
+    ),
+    starfieldWarp: (
+        <div className="bg-preview-scene bg-preview-starfield">
+            {Array.from({ length: 20 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-warp-star"
+                    style={{
+                        left: `${50 + (Math.random() - 0.5) * 60}%`,
+                        top: `${50 + (Math.random() - 0.5) * 60}%`,
+                        animationDelay: `${i * 0.15}s`,
+                        transform: `rotate(${Math.atan2(
+                            (50 + (Math.random() - 0.5) * 60) - 50,
+                            (50 + (Math.random() - 0.5) * 60) - 50
+                        ) * (180 / Math.PI)}deg)`,
+                    }}
+                />
+            ))}
+            <div className="preview-warp-center" />
+        </div>
+    ),
     none: (
         <div className="bg-preview-scene bg-preview-none">
             <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No animation</span>

@@ -24,17 +24,13 @@ const adminLinks = [
     { to: '/admin/settings', label: 'Platform Settings', icon: Shield },
 ];
 
-export default function Sidebar({ type = 'user', isOpen = false, onClose }) {
+export default function Sidebar({ type = 'user' }) {
     const { user } = useAuth();
     const links = type === 'admin' ? adminLinks : userLinks;
     const sectionTitle = type === 'admin' ? 'Administration' : 'Navigation';
 
-    const handleLinkClick = () => {
-        if (onClose) onClose();
-    };
-
     return (
-        <aside className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
+        <aside className="sidebar">
             <div className="sidebar-section">
                 <div className="sidebar-section-title">{sectionTitle}</div>
                 {links.map((link) => {
@@ -45,7 +41,6 @@ export default function Sidebar({ type = 'user', isOpen = false, onClose }) {
                             to={link.to}
                             end
                             className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-                            onClick={handleLinkClick}
                         >
                             <Icon size={18} />
                             {link.label}
@@ -62,7 +57,6 @@ export default function Sidebar({ type = 'user', isOpen = false, onClose }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="sidebar-link"
-                        onClick={handleLinkClick}
                     >
                         <ExternalLink size={18} />
                         View Portfolio
@@ -73,7 +67,7 @@ export default function Sidebar({ type = 'user', isOpen = false, onClose }) {
             {type === 'admin' && (
                 <div className="sidebar-section">
                     <div className="sidebar-section-title">Switch</div>
-                    <NavLink to="/dashboard" className="sidebar-link" onClick={handleLinkClick}>
+                    <NavLink to="/dashboard" className="sidebar-link">
                         <LayoutDashboard size={18} />
                         User Dashboard
                     </NavLink>
