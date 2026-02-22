@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getTechInfo } from '../data/techStack';
 import { backgroundComponents } from '../components/backgrounds';
@@ -28,7 +28,13 @@ export default function PublicPortfolio() {
     const [selectedProject, setSelectedProject] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
 
+    const fetchedRef = useRef(false);
+
     useEffect(() => {
+        // Guard against React StrictMode double-mount (prevents double view count)
+        if (fetchedRef.current) return;
+        fetchedRef.current = true;
+
         const fetchPortfolio = async () => {
             try {
                 const userRes = await fetch(`/api/users/${username}`);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import ImageCropper from '../../components/ImageCropper';
-import { Save, AlertCircle, CheckCircle, X, User, Plus, Trash2, Link as LinkIcon, Mail, Image } from 'lucide-react';
+import { Save, AlertCircle, CheckCircle, X, User, Plus, Trash2, Link as LinkIcon, Mail, Image, Key, AtSign } from 'lucide-react';
 import TechPicker from '../../components/TechPicker';
 
 export default function Settings() {
@@ -24,6 +24,16 @@ export default function Settings() {
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
+    // Account settings state
+    const [accountData, setAccountData] = useState({ username: '', email: '', displayName: '' });
+    const [accountMsg, setAccountMsg] = useState({ type: '', text: '' });
+    const [savingAccount, setSavingAccount] = useState(false);
+
+    // Password change state
+    const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    const [passwordMsg, setPasswordMsg] = useState({ type: '', text: '' });
+    const [changingPassword, setChangingPassword] = useState(false);
+
     useEffect(() => {
         if (user) {
             setFormData({
@@ -41,12 +51,59 @@ export default function Settings() {
                 },
                 customSocialLinks: user.customSocialLinks || [],
             });
+            setAccountData({
+                username: user.username || '',
+                email: user.email || '',
+                displayName: user.displayName || '',
+            });
         }
     }, [user]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+    };
+
+    const handleAccountSave = async (e) => {
+        e.preventDefault();
+        setSavingAccount(true);
+        setAccountMsg({ type: '', text: '' });
+        try {
+            const data = await apiFetch('/auth/update-account', {
+                method: 'PUT',
+                body: JSON.stringify(accountData),
+            });
+            updateUser(data.user);
+            setAccountMsg({ type: 'success', text: data.message });
+            setTimeout(() => setAccountMsg({ type: '', text: '' }), 4000);
+        } catch (err) {
+            setAccountMsg({ type: 'error', text: err.message });
+        } finally {
+            setSavingAccount(false);
+        }
+    };
+
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        setPasswordMsg({ type: '', text: '' });
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setPasswordMsg({ type: 'error', text: 'New passwords do not match' });
+            return;
+        }
+        setChangingPassword(true);
+        try {
+            const data = await apiFetch('/auth/change-password', {
+                method: 'PUT',
+                body: JSON.stringify({ currentPassword: passwordData.currentPassword, newPassword: passwordData.newPassword }),
+            });
+            setPasswordMsg({ type: 'success', text: data.message });
+            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            setTimeout(() => setPasswordMsg({ type: '', text: '' }), 4000);
+        } catch (err) {
+            setPasswordMsg({ type: 'error', text: err.message });
+        } finally {
+            setChangingPassword(false);
+        }
     };
 
     const handleSocialChange = (platform, value) => {
@@ -107,13 +164,85 @@ export default function Settings() {
         <div className="fade-in">
             <div className="dashboard-header">
                 <div>
-                    <h1 className="dashboard-title">Profile Settings</h1>
+                    <h1 className="dashboard-title">Settings</h1>
                     <p className="dashboard-subtitle">
-                        Customize your public profile, social links, and add custom links.
+                        Account, security, profile, and social links.
                     </p>
                 </div>
             </div>
 
+            {/* Account Settings */}
+            <div className="card" style={{ maxWidth: 720, marginBottom: 24 }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <AtSign size={18} />
+                    Account Settings
+                </h3>
+
+                {accountMsg.text && (
+                    <div className="auth-error" style={accountMsg.type === 'success' ? { background: 'var(--success-bg)', color: 'var(--success)', borderColor: 'rgba(0,206,201,0.2)', marginBottom: 16 } : { marginBottom: 16 }}>
+                        {accountMsg.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+                        {accountMsg.text}
+                    </div>
+                )}
+
+                <form onSubmit={handleAccountSave}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+                        <div className="form-group">
+                            <label className="form-label">Username</label>
+                            <input type="text" className="form-input" value={accountData.username} onChange={(e) => setAccountData({ ...accountData, username: e.target.value })} required minLength={3} maxLength={30} />
+                            <p className="form-hint">evoq.com/{accountData.username}</p>
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Display Name</label>
+                            <input type="text" className="form-input" value={accountData.displayName} onChange={(e) => setAccountData({ ...accountData, displayName: e.target.value })} required maxLength={50} />
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">Email</label>
+                        <input type="email" className="form-input" value={accountData.email} onChange={(e) => setAccountData({ ...accountData, email: e.target.value })} required />
+                    </div>
+                    <button type="submit" className="btn btn-primary btn-sm" disabled={savingAccount}>
+                        <Save size={14} /> {savingAccount ? 'Saving...' : 'Update Account'}
+                    </button>
+                </form>
+            </div>
+
+            {/* Password Change */}
+            <div className="card" style={{ maxWidth: 720, marginBottom: 24 }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Key size={18} />
+                    Change Password
+                </h3>
+
+                {passwordMsg.text && (
+                    <div className="auth-error" style={passwordMsg.type === 'success' ? { background: 'var(--success-bg)', color: 'var(--success)', borderColor: 'rgba(0,206,201,0.2)', marginBottom: 16 } : { marginBottom: 16 }}>
+                        {passwordMsg.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+                        {passwordMsg.text}
+                    </div>
+                )}
+
+                <form onSubmit={handlePasswordChange}>
+                    <div className="form-group">
+                        <label className="form-label">Current Password</label>
+                        <input type="password" className="form-input" value={passwordData.currentPassword} onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })} required />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+                        <div className="form-group">
+                            <label className="form-label">New Password</label>
+                            <input type="password" className="form-input" value={passwordData.newPassword} onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })} required minLength={6} />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Confirm New Password</label>
+                            <input type="password" className="form-input" value={passwordData.confirmPassword} onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })} required minLength={6} />
+                        </div>
+                    </div>
+                    <button type="submit" className="btn btn-primary btn-sm" disabled={changingPassword}>
+                        <Key size={14} /> {changingPassword ? 'Changing...' : 'Change Password'}
+                    </button>
+                </form>
+            </div>
+
+            {/* Profile Settings */}
             {message.text && (
                 <div
                     className={message.type === 'success' ? 'auth-error' : 'auth-error'}

@@ -65,6 +65,14 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    likes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    }],
+    likeCount: {
+        type: Number,
+        default: 0,
+    },
     backgroundStyle: {
         type: String,
         default: 'orbs',
@@ -99,6 +107,7 @@ userSchema.methods.toPublicJSON = function () {
         customSocialLinks: this.customSocialLinks || [],
         backgroundStyle: this.backgroundStyle || 'orbs',
         profileViews: this.profileViews,
+        likeCount: this.likeCount || 0,
         createdAt: this.createdAt,
     };
 };

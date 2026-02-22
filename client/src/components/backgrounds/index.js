@@ -12,6 +12,12 @@ import DigitalRainBackground from './DigitalRainBackground';
 import NebulaBackground from './NebulaBackground';
 import LightningBackground from './LightningBackground';
 import StarfieldWarpBackground from './StarfieldWarpBackground';
+import ShootingStarsBackground from './ShootingStarsBackground';
+import GalaxySpiralBackground from './GalaxySpiralBackground';
+import CircuitBoardBackground from './CircuitBoardBackground';
+import AuroraBorealisBackground from './AuroraBorealisBackground';
+import CyberTunnelBackground from './CyberTunnelBackground';
+import DeepSpaceBackground from './DeepSpaceBackground';
 
 export const backgroundComponents = {
     orbs: OrbsBackground,
@@ -28,6 +34,12 @@ export const backgroundComponents = {
     nebula: NebulaBackground,
     lightning: LightningBackground,
     starfieldWarp: StarfieldWarpBackground,
+    shootingStars: ShootingStarsBackground,
+    galaxySpiral: GalaxySpiralBackground,
+    circuitBoard: CircuitBoardBackground,
+    auroraBorealis: AuroraBorealisBackground,
+    cyberTunnel: CyberTunnelBackground,
+    deepSpace: DeepSpaceBackground,
 };
 
 export const backgroundList = [
@@ -100,6 +112,36 @@ export const backgroundList = [
         id: 'starfieldWarp',
         name: 'Starfield Warp',
         description: 'Hyperspace warp drive with stars streaking from the center',
+    },
+    {
+        id: 'shootingStars',
+        name: 'Shooting Stars',
+        description: 'Deep space sky with twinkling stars and dazzling shooting star trails',
+    },
+    {
+        id: 'galaxySpiral',
+        name: 'Galaxy Spiral',
+        description: 'Slowly rotating spiral galaxy with star clusters and core glow',
+    },
+    {
+        id: 'circuitBoard',
+        name: 'Circuit Board',
+        description: 'Technical PCB grid with nodes, traces, and flowing data pulses',
+    },
+    {
+        id: 'auroraBorealis',
+        name: 'Aurora Borealis',
+        description: 'Realistic northern lights with shimmering green, teal, and purple curtains',
+    },
+    {
+        id: 'cyberTunnel',
+        name: 'Cyber Tunnel',
+        description: 'Futuristic hexagonal wormhole with data streams and floating hex code',
+    },
+    {
+        id: 'deepSpace',
+        name: 'Deep Space',
+        description: 'Vast universe with distant galaxies, nebula clouds, and star cross-flares',
     },
     {
         id: 'none',

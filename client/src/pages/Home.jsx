@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Feed from './Feed';
 import {
     ArrowRight,
     Layers,
@@ -17,6 +18,12 @@ import {
 export default function Home() {
     const { isAuthenticated } = useAuth();
 
+    // Logged-in users see the social discovery feed
+    if (isAuthenticated) {
+        return <Feed />;
+    }
+
+    // Guests see the landing page
     return (
         <div>
             {/* Hero Section */}
@@ -39,23 +46,14 @@ export default function Home() {
                     </p>
 
                     <div className="hero-actions">
-                        {isAuthenticated ? (
-                            <Link to="/dashboard" className="btn btn-primary btn-lg">
-                                Go to Dashboard
-                                <ArrowRight size={18} />
-                            </Link>
-                        ) : (
-                            <>
-                                <Link to="/signup" className="btn btn-primary btn-lg">
-                                    Get Started Free
-                                    <ArrowRight size={18} />
-                                </Link>
-                                <Link to="/login" className="btn btn-secondary btn-lg">
-                                    Sign In
-                                    <ChevronRight size={18} />
-                                </Link>
-                            </>
-                        )}
+                        <Link to="/signup" className="btn btn-primary btn-lg">
+                            Get Started Free
+                            <ArrowRight size={18} />
+                        </Link>
+                        <Link to="/login" className="btn btn-secondary btn-lg">
+                            Sign In
+                            <ChevronRight size={18} />
+                        </Link>
                     </div>
 
                     <div className="hero-stats">
@@ -199,17 +197,10 @@ export default function Home() {
                         Join thousands of developers who trust EvoQ to showcase their work.
                         It is completely free, no credit card required.
                     </p>
-                    {isAuthenticated ? (
-                        <Link to="/dashboard" className="btn btn-primary btn-lg">
-                            Open Dashboard
-                            <ArrowRight size={18} />
-                        </Link>
-                    ) : (
-                        <Link to="/signup" className="btn btn-primary btn-lg">
-                            Create Your Portfolio Now
-                            <ArrowRight size={18} />
-                        </Link>
-                    )}
+                    <Link to="/signup" className="btn btn-primary btn-lg">
+                        Create Your Portfolio Now
+                        <ArrowRight size={18} />
+                    </Link>
                 </div>
             </section>
 

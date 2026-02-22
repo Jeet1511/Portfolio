@@ -1,6 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -131,6 +132,90 @@ router.get('/me', async (req, res) => {
         });
     } catch (error) {
         return res.status(401).json({ message: 'Not authorized' });
+    }
+});
+
+// PUT /api/auth/update-account - Update username, email, displayName
+router.put('/update-account', protect, async (req, res) => {
+    try {
+        const { username, email, displayName } = req.body;
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // Validate and update username
+        if (username && username.toLowerCase() !== user.username) {
+            const newUsername = username.toLowerCase();
+            if (!/^[a-z0-9_-]+$/.test(newUsername)) {
+                return res.status(400).json({ message: 'Username can only contain lowercase letters, numbers, hyphens, and underscores' });
+            }
+            if (newUsername.length < 3 || newUsername.length > 30) {
+                return res.status(400).json({ message: 'Username must be between 3 and 30 characters' });
+            }
+            const reserved = ['admin', 'login', 'signup', 'dashboard', 'settings', 'api', 'explore'];
+            if (reserved.includes(newUsername)) {
+                return res.status(400).json({ message: 'This username is reserved' });
+            }
+            const existing = await User.findOne({ username: newUsername });
+            if (existing) return res.status(400).json({ message: 'Username already taken' });
+            user.username = newUsername;
+        }
+
+        // Validate and update email
+        if (email && email.toLowerCase() !== user.email) {
+            const existing = await User.findOne({ email: email.toLowerCase() });
+            if (existing) return res.status(400).json({ message: 'Email already registered' });
+            user.email = email.toLowerCase();
+        }
+
+        // Update displayName
+        if (displayName !== undefined) {
+            user.displayName = displayName;
+        }
+
+        await user.save();
+
+        res.json({
+            message: 'Account updated successfully',
+            user: {
+                ...user.toPublicJSON(),
+                email: user.email,
+                role: user.role,
+            },
+        });
+    } catch (error) {
+        console.error('Update account error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// PUT /api/auth/change-password - Change password
+router.put('/change-password', protect, async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ message: 'Current and new passwords are required' });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({ message: 'New password must be at least 6 characters' });
+        }
+
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const isMatch = await user.comparePassword(currentPassword);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Current password is incorrect' });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ message: 'Password changed successfully' });
+    } catch (error) {
+        console.error('Change password error:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 

@@ -13,6 +13,7 @@ import Settings from './pages/dashboard/Settings';
 import Background from './pages/dashboard/Background';
 import DashboardLayout from './components/DashboardLayout';
 import NotFound from './pages/NotFound';
+import Feed from './pages/Feed';
 
 // Admin imports (completely separate)
 import AdminLayout from './components/AdminLayout';
@@ -120,6 +121,9 @@ export default function App() {
                     <Navbar />
                     <Routes>
                         <Route path="/" element={<Home />} />
+                        <Route path="/explore" element={
+                            <ProtectedRoute><Feed /></ProtectedRoute>
+                        } />
 
                         <Route path="/login" element={
                             <GuestRoute><Login /></GuestRoute>
