@@ -4,7 +4,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('evoq_token'));
+    const [token, setToken] = useState(localStorage.getItem('evoz_token'));
     const [loading, setLoading] = useState(true);
 
     const API_BASE = (import.meta.env.VITE_API_URL || '') + '/api';
@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
             setUser(data.user);
         } catch (err) {
             console.error('Failed to load user:', err);
-            localStorage.removeItem('evoq_token');
+            localStorage.removeItem('evoz_token');
             setToken(null);
             setUser(null);
         } finally {
@@ -62,7 +62,7 @@ export function AuthProvider({ children }) {
             body: JSON.stringify({ email, password }),
         });
 
-        localStorage.setItem('evoq_token', data.token);
+        localStorage.setItem('evoz_token', data.token);
         setToken(data.token);
         setUser(data.user);
         return data.user;
@@ -74,14 +74,14 @@ export function AuthProvider({ children }) {
             body: JSON.stringify({ username, email, password, displayName }),
         });
 
-        localStorage.setItem('evoq_token', data.token);
+        localStorage.setItem('evoz_token', data.token);
         setToken(data.token);
         setUser(data.user);
         return data.user;
     };
 
     const logout = () => {
-        localStorage.removeItem('evoq_token');
+        localStorage.removeItem('evoz_token');
         setToken(null);
         setUser(null);
     };

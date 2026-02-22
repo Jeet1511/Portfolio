@@ -7,7 +7,7 @@ export default function IPManagement() {
     const [loginLogs, setLoginLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [blockedIPs, setBlockedIPs] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('evoq_blocked_ips') || '[]'); }
+        try { return JSON.parse(localStorage.getItem('evoz_blocked_ips') || '[]'); }
         catch { return []; }
     });
     const [newIP, setNewIP] = useState('');
@@ -22,7 +22,7 @@ export default function IPManagement() {
 
     const saveBlocked = (list) => {
         setBlockedIPs(list);
-        localStorage.setItem('evoq_blocked_ips', JSON.stringify(list));
+        localStorage.setItem('evoz_blocked_ips', JSON.stringify(list));
     };
 
     const handleBlock = () => {

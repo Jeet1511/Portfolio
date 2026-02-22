@@ -53,15 +53,15 @@ app.get('*', (req, res) => {
 const startServer = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URI);
-        console.log('[EvoQ] Connected to MongoDB');
+        console.log('[EvoZ] Connected to MongoDB');
         await seedSuperAdmin();
     } catch (error) {
-        console.warn('[EvoQ] MongoDB connection failed:', error.message);
-        console.warn('[EvoQ] Running without database - some features will not work');
+        console.warn('[EvoZ] MongoDB connection failed:', error.message);
+        console.warn('[EvoZ] Running without database - some features will not work');
     }
 
     app.listen(PORT, () => {
-        console.log(`[EvoQ] Server running on port ${PORT}`);
+        console.log(`[EvoZ] Server running on port ${PORT}`);
     });
 };
 

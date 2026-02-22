@@ -50,7 +50,7 @@ export default function Navbar() {
             {/* Top navbar - always visible */}
             <nav className="navbar">
                 <Link to="/" className="navbar-logo">
-                    Evo<span className="logo-accent">Q</span>
+                    Evo<span className="logo-accent">Z</span>
                 </Link>
 
                 {/* Desktop links - hidden on mobile via CSS */}

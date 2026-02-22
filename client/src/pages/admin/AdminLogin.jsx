@@ -33,7 +33,7 @@ export default function AdminLogin() {
                             <Shield size={40} />
                         </div>
                         <h1>Admin Panel</h1>
-                        <p>Evo<span style={{ color: 'var(--accent-primary)' }}>Q</span> Administration</p>
+                        <p>Evo<span style={{ color: 'var(--accent-primary)' }}>Z</span> Administration</p>
                     </div>
 
                     {error && <div className="admin-login-error">{error}</div>}
@@ -45,7 +45,7 @@ export default function AdminLogin() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="admin@evoq.com"
+                                placeholder="admin@evoz.com"
                                 required
                                 autoFocus
                             />

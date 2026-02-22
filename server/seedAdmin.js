@@ -12,7 +12,7 @@ export async function seedSuperAdmin() {
             if (existing.role !== 'super_admin') {
                 existing.role = 'super_admin';
                 await existing.save();
-                console.log('[EvoQ] Super Admin role confirmed');
+                console.log('[EvoZ] Super Admin role confirmed');
             }
             return;
         }
@@ -25,8 +25,8 @@ export async function seedSuperAdmin() {
         });
 
         await superAdmin.save();
-        console.log('[EvoQ] Super Admin account created (jeet@gmail.com)');
+        console.log('[EvoZ] Super Admin account created (jeet@gmail.com)');
     } catch (error) {
-        console.error('[EvoQ] Failed to seed Super Admin:', error.message);
+        console.error('[EvoZ] Failed to seed Super Admin:', error.message);
     }
 }

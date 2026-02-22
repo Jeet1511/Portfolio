@@ -92,7 +92,7 @@ export default function Home() {
                         </div>
                         <h3>Custom URL</h3>
                         <p>
-                            Get your own unique URL. Share evoq.com/yourusername and let the
+                            Get your own unique URL. Share evoz.com/yourusername and let the
                             world discover your work instantly.
                         </p>
                     </div>
@@ -196,7 +196,7 @@ export default function Home() {
                 <div className="cta-card">
                     <h2>Ready to Build Your Portfolio?</h2>
                     <p>
-                        Join thousands of developers who trust EvoQ to showcase their work.
+                        Join thousands of developers who trust EvoZ to showcase their work.
                         It is completely free, no credit card required.
                     </p>
                     <Link to="/signup" className="btn btn-primary btn-lg">
@@ -240,7 +240,7 @@ export default function Home() {
                         </div>
                     </div>
                     <div className="footer-copyright">
-                        EvoQ. Built with precision and purpose.
+                        EvoZ. Built with precision and purpose.
                     </div>
                 </div>
             </footer>

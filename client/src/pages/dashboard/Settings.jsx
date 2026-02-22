@@ -190,7 +190,7 @@ export default function Settings() {
                         <div className="form-group">
                             <label className="form-label">Username</label>
                             <input type="text" className="form-input" value={accountData.username} onChange={(e) => setAccountData({ ...accountData, username: e.target.value })} required minLength={3} maxLength={30} />
-                            <p className="form-hint">evoq.com/{accountData.username}</p>
+                            <p className="form-hint">evoz.com/{accountData.username}</p>
                         </div>
                         <div className="form-group">
                             <label className="form-label">Display Name</label>

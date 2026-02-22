@@ -4,7 +4,7 @@ const AdminAuthContext = createContext(null);
 
 export function AdminAuthProvider({ children }) {
     const [admin, setAdmin] = useState(null);
-    const [adminToken, setAdminToken] = useState(localStorage.getItem('evoq_admin_token'));
+    const [adminToken, setAdminToken] = useState(localStorage.getItem('evoz_admin_token'));
     const [loading, setLoading] = useState(true);
 
     const API_BASE = (import.meta.env.VITE_API_URL || '') + '/api/admin-auth';
@@ -33,7 +33,7 @@ export function AdminAuthProvider({ children }) {
         adminFetch('/me')
             .then((data) => setAdmin(data.admin))
             .catch(() => {
-                localStorage.removeItem('evoq_admin_token');
+                localStorage.removeItem('evoz_admin_token');
                 setAdminToken(null);
                 setAdmin(null);
             })
@@ -46,14 +46,14 @@ export function AdminAuthProvider({ children }) {
             body: JSON.stringify({ email, password }),
         });
 
-        localStorage.setItem('evoq_admin_token', data.token);
+        localStorage.setItem('evoz_admin_token', data.token);
         setAdminToken(data.token);
         setAdmin(data.admin);
         return data.admin;
     };
 
     const adminLogout = () => {
-        localStorage.removeItem('evoq_admin_token');
+        localStorage.removeItem('evoz_admin_token');
         setAdminToken(null);
         setAdmin(null);
     };

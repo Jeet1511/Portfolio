@@ -5,7 +5,7 @@ import { Save, ToggleLeft, ToggleRight, Key, CheckCircle } from 'lucide-react';
 export default function SiteSettings() {
     const { adminFetch, admin } = useAdminAuth();
     const [settings, setSettings] = useState({
-        siteName: 'EvoQ',
+        siteName: 'EvoZ',
         siteDescription: 'Professional Portfolio Platform',
         maintenanceMode: false,
         registrationEnabled: true,
