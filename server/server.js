@@ -37,8 +37,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/admin-auth', adminAuthRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// Serve uploads
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+// Cloudinary is used for all image hosting. No local uploads directory serving.
 
 // Serve React build in production
 const clientBuild = path.join(__dirname, '..', 'client', 'dist');

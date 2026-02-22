@@ -7,7 +7,7 @@ export function AdminAuthProvider({ children }) {
     const [adminToken, setAdminToken] = useState(localStorage.getItem('evoz_admin_token'));
     const [loading, setLoading] = useState(true);
 
-    const API_BASE = (import.meta.env.VITE_API_URL || '') + '/api/admin-auth';
+    const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '') + '/api/admin-auth';
 
     // Helper for authenticated admin fetches
     const adminFetch = async (url, options = {}) => {

@@ -7,7 +7,14 @@ export function AuthProvider({ children }) {
     const [token, setToken] = useState(localStorage.getItem('evoz_token'));
     const [loading, setLoading] = useState(true);
 
-    const API_BASE = (import.meta.env.VITE_API_URL || '') + '/api';
+    const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '') + '/api';
+
+    useEffect(() => {
+        console.log('[EvoZ] API Base URL:', API_BASE);
+        if (!import.meta.env.VITE_API_URL) {
+            console.warn('[EvoZ] VITE_API_URL is not set! API calls will default to current domain.');
+        }
+    }, [API_BASE]);
 
     const apiFetch = useCallback(async (url, options = {}) => {
         const headers = {
@@ -101,6 +108,7 @@ export function AuthProvider({ children }) {
         apiFetch,
         isAdmin: user?.role === 'admin',
         isAuthenticated: !!user,
+        API_BASE,
     };
 
     return (

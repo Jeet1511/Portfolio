@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { getTechInfo } from '../data/techStack';
 import { backgroundComponents } from '../components/backgrounds';
 import {
@@ -21,6 +22,7 @@ import {
 
 export default function PublicPortfolio() {
     const { username } = useParams();
+    const { API_BASE } = useAuth();
     const [user, setUser] = useState(null);
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -37,7 +39,7 @@ export default function PublicPortfolio() {
 
         const fetchPortfolio = async () => {
             try {
-                const userRes = await fetch(`/api/users/${username}`);
+                const userRes = await fetch(`${API_BASE}/users/${username}`);
                 if (!userRes.ok) {
                     setError('Portfolio not found');
                     setLoading(false);
@@ -46,7 +48,7 @@ export default function PublicPortfolio() {
                 const userData = await userRes.json();
                 setUser(userData.user);
 
-                const projRes = await fetch(`/api/users/${username}/projects`);
+                const projRes = await fetch(`${API_BASE}/users/${username}/projects`);
                 if (projRes.ok) {
                     const projData = await projRes.json();
                     setProjects(projData.projects);

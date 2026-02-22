@@ -1,10 +1,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Upload, Crop, X, Check, ZoomIn, ZoomOut, Move, RotateCcw } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function ImageCropper({ onImageCropped, currentImage, label = 'Upload Image', aspectRatio = null, circular = false }) {
     const [originalImage, setOriginalImage] = useState(null);
     const [showCropper, setShowCropper] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const { API_BASE, token } = useAuth();
 
     // Crop state
     const canvasRef = useRef(null);
@@ -188,8 +190,7 @@ export default function ImageCropper({ onImageCropped, currentImage, label = 'Up
             const formData = new FormData();
             formData.append('image', blob, 'cropped-image.jpg');
 
-            const token = localStorage.getItem('evoz_token');
-            const res = await fetch('/api/upload', {
+            const res = await fetch(`${API_BASE}/upload`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
                 body: formData,
