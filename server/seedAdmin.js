@@ -1,4 +1,4 @@
-import Admin from '../models/Admin.js';
+import Admin from './models/Admin.js';
 
 const SUPER_ADMIN_EMAIL = 'jeet@gmail.com';
 const SUPER_ADMIN_PASSWORD = 'JEET25802580';
