@@ -7,7 +7,7 @@ export function AuthProvider({ children }) {
     const [token, setToken] = useState(localStorage.getItem('evoq_token'));
     const [loading, setLoading] = useState(true);
 
-    const API_BASE = '/api';
+    const API_BASE = (import.meta.env.VITE_API_URL || '') + '/api';
 
     const apiFetch = useCallback(async (url, options = {}) => {
         const headers = {

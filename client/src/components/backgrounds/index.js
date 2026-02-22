@@ -18,6 +18,9 @@ import CircuitBoardBackground from './CircuitBoardBackground';
 import AuroraBorealisBackground from './AuroraBorealisBackground';
 import CyberTunnelBackground from './CyberTunnelBackground';
 import DeepSpaceBackground from './DeepSpaceBackground';
+import QuantumFieldBackground from './QuantumFieldBackground';
+import HologramGridBackground from './HologramGridBackground';
+import WormholeBackground from './WormholeBackground';
 
 export const backgroundComponents = {
     orbs: OrbsBackground,
@@ -40,6 +43,9 @@ export const backgroundComponents = {
     auroraBorealis: AuroraBorealisBackground,
     cyberTunnel: CyberTunnelBackground,
     deepSpace: DeepSpaceBackground,
+    quantumField: QuantumFieldBackground,
+    hologramGrid: HologramGridBackground,
+    wormhole: WormholeBackground,
 };
 
 export const backgroundList = [
@@ -142,6 +148,21 @@ export const backgroundList = [
         id: 'deepSpace',
         name: 'Deep Space',
         description: 'Vast universe with distant galaxies, nebula clouds, and star cross-flares',
+    },
+    {
+        id: 'quantumField',
+        name: 'Quantum Field',
+        description: 'Quantum particles with wave-particle duality and entanglement lines',
+    },
+    {
+        id: 'hologramGrid',
+        name: 'Hologram Grid',
+        description: '3D perspective grid with scan lines, floating data, and HUD brackets',
+    },
+    {
+        id: 'wormhole',
+        name: 'Wormhole',
+        description: 'Cosmic vortex with spiral particles, energy rings, and a pulsing core',
     },
     {
         id: 'none',

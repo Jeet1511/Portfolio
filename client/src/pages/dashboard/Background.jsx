@@ -187,6 +187,207 @@ const previewRenderers = {
             <div className="preview-warp-center" />
         </div>
     ),
+    shootingStars: (
+        <div className="bg-preview-scene bg-preview-shooting-stars">
+            {Array.from({ length: 25 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-bg-star"
+                    style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                        width: `${1 + Math.random() * 2}px`,
+                        height: `${1 + Math.random() * 2}px`,
+                        animationDelay: `${Math.random() * 3}s`,
+                    }}
+                />
+            ))}
+            <div className="preview-meteor preview-meteor-1" />
+            <div className="preview-meteor preview-meteor-2" />
+            <div className="preview-meteor preview-meteor-3" />
+        </div>
+    ),
+    galaxySpiral: (
+        <div className="bg-preview-scene bg-preview-galaxy">
+            <div className="preview-galaxy-core" />
+            <div className="preview-galaxy-arm preview-galaxy-arm-1" />
+            <div className="preview-galaxy-arm preview-galaxy-arm-2" />
+            <div className="preview-galaxy-arm preview-galaxy-arm-3" />
+            {Array.from({ length: 12 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-bg-star"
+                    style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                        width: `${1 + Math.random() * 1.5}px`,
+                        height: `${1 + Math.random() * 1.5}px`,
+                        opacity: 0.2 + Math.random() * 0.3,
+                    }}
+                />
+            ))}
+        </div>
+    ),
+    circuitBoard: (
+        <div className="bg-preview-scene bg-preview-circuit">
+            {Array.from({ length: 6 }, (_, i) => (
+                <div
+                    key={`h${i}`}
+                    className="preview-trace-h"
+                    style={{ top: `${15 + i * 15}%`, left: `${Math.random() * 30}%`, width: `${30 + Math.random() * 40}%`, animationDelay: `${i * 0.4}s` }}
+                />
+            ))}
+            {Array.from({ length: 5 }, (_, i) => (
+                <div
+                    key={`v${i}`}
+                    className="preview-trace-v"
+                    style={{ left: `${15 + i * 18}%`, top: `${Math.random() * 30}%`, height: `${30 + Math.random() * 40}%`, animationDelay: `${i * 0.5}s` }}
+                />
+            ))}
+            {Array.from({ length: 8 }, (_, i) => (
+                <div
+                    key={`n${i}`}
+                    className="preview-circuit-node"
+                    style={{ left: `${10 + Math.random() * 80}%`, top: `${10 + Math.random() * 80}%`, animationDelay: `${i * 0.3}s` }}
+                />
+            ))}
+            <div className="preview-pulse preview-pulse-1" />
+            <div className="preview-pulse preview-pulse-2" />
+        </div>
+    ),
+    auroraBorealis: (
+        <div className="bg-preview-scene bg-preview-aurora">
+            <div className="preview-aurora-curtain preview-aurora-curtain-1" />
+            <div className="preview-aurora-curtain preview-aurora-curtain-2" />
+            <div className="preview-aurora-curtain preview-aurora-curtain-3" />
+            {Array.from({ length: 10 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-bg-star"
+                    style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 50}%`,
+                        width: `${1 + Math.random() * 1.5}px`,
+                        height: `${1 + Math.random() * 1.5}px`,
+                    }}
+                />
+            ))}
+        </div>
+    ),
+    cyberTunnel: (
+        <div className="bg-preview-scene bg-preview-tunnel">
+            {Array.from({ length: 5 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-tunnel-ring"
+                    style={{
+                        width: `${20 + i * 18}%`,
+                        height: `${20 + i * 18}%`,
+                        animationDelay: `${i * 0.3}s`,
+                        opacity: 0.6 - i * 0.08,
+                    }}
+                />
+            ))}
+            <div className="preview-tunnel-center" />
+            {Array.from({ length: 6 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-data-stream"
+                    style={{
+                        transform: `rotate(${i * 60}deg)`,
+                        animationDelay: `${i * 0.2}s`,
+                    }}
+                />
+            ))}
+        </div>
+    ),
+    deepSpace: (
+        <div className="bg-preview-scene bg-preview-deep-space">
+            {Array.from({ length: 30 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-bg-star"
+                    style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                        width: `${0.5 + Math.random() * 2}px`,
+                        height: `${0.5 + Math.random() * 2}px`,
+                        animationDelay: `${Math.random() * 4}s`,
+                    }}
+                />
+            ))}
+            <div className="preview-nebula-cloud preview-nebula-cloud-1" />
+            <div className="preview-nebula-cloud preview-nebula-cloud-2" />
+            <div className="preview-mini-galaxy preview-mini-galaxy-1" />
+            <div className="preview-mini-galaxy preview-mini-galaxy-2" />
+        </div>
+    ),
+    quantumField: (
+        <div className="bg-preview-scene bg-preview-quantum">
+            {Array.from({ length: 15 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-quantum-particle"
+                    style={{
+                        left: `${10 + Math.random() * 80}%`,
+                        top: `${10 + Math.random() * 80}%`,
+                        animationDelay: `${Math.random() * 3}s`,
+                        animationDuration: `${2 + Math.random() * 2}s`,
+                    }}
+                />
+            ))}
+            <div className="preview-quantum-wave preview-quantum-wave-1" />
+            <div className="preview-quantum-wave preview-quantum-wave-2" />
+            <div className="preview-quantum-wave preview-quantum-wave-3" />
+        </div>
+    ),
+    hologramGrid: (
+        <div className="bg-preview-scene bg-preview-hologrid">
+            <div className="preview-hologrid-floor" />
+            <div className="preview-hologrid-scanline" />
+            <div className="preview-hologrid-corner preview-hologrid-tl" />
+            <div className="preview-hologrid-corner preview-hologrid-tr" />
+            <div className="preview-hologrid-corner preview-hologrid-bl" />
+            <div className="preview-hologrid-corner preview-hologrid-br" />
+            {Array.from({ length: 4 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-hologrid-data"
+                    style={{
+                        left: `${15 + Math.random() * 70}%`,
+                        animationDelay: `${i * 0.8}s`,
+                    }}
+                />
+            ))}
+        </div>
+    ),
+    wormhole: (
+        <div className="bg-preview-scene bg-preview-wormhole">
+            {Array.from({ length: 5 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-wormhole-ring"
+                    style={{
+                        width: `${20 + i * 20}%`,
+                        height: `${14 + i * 14}%`,
+                        animationDelay: `${i * 0.4}s`,
+                        opacity: 0.5 - i * 0.06,
+                    }}
+                />
+            ))}
+            <div className="preview-wormhole-core" />
+            {Array.from({ length: 8 }, (_, i) => (
+                <div
+                    key={i}
+                    className="preview-wormhole-particle"
+                    style={{
+                        animationDelay: `${i * 0.3}s`,
+                        animationDuration: `${2 + Math.random()}s`,
+                    }}
+                />
+            ))}
+        </div>
+    ),
     none: (
         <div className="bg-preview-scene bg-preview-none">
             <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No animation</span>
@@ -196,9 +397,12 @@ const previewRenderers = {
 
 export default function Background() {
     const { user, apiFetch, updateUser } = useAuth();
-    const [selected, setSelected] = useState(user?.backgroundStyle || 'orbs');
+    const savedBg = user?.backgroundStyle || 'orbs';
+    const [selected, setSelected] = useState(savedBg);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
+
+    const hasChanges = selected !== savedBg;
 
     const handleSave = async () => {
         setSaving(true);
@@ -235,7 +439,7 @@ export default function Background() {
                     <div
                         key={bg.id}
                         className={`bg-selector-card ${selected === bg.id ? 'bg-selected' : ''}`}
-                        onClick={() => setSelected(bg.id)}
+                        onClick={() => { setSelected(bg.id); setMessage({ type: '', text: '' }); }}
                     >
                         {previewRenderers[bg.id]}
                         <div className="bg-selector-info">
@@ -249,11 +453,23 @@ export default function Background() {
                 ))}
             </div>
 
-            <div style={{ marginTop: 24 }}>
-                <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-                    <Save size={16} />
-                    {saving ? 'Saving...' : 'Save Background'}
-                </button>
+            {/* Floating save bar — appears only when selection changes */}
+            <div className={`floating-save-bar ${hasChanges ? 'floating-save-visible' : ''}`}>
+                <div className="floating-save-content">
+                    <span className="floating-save-text">You have unsaved changes</span>
+                    <div className="floating-save-actions">
+                        <button
+                            className="btn btn-ghost"
+                            onClick={() => { setSelected(savedBg); setMessage({ type: '', text: '' }); }}
+                        >
+                            Reset
+                        </button>
+                        <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+                            <Save size={16} />
+                            {saving ? 'Saving...' : 'Save Background'}
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

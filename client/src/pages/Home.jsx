@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Feed from './Feed';
+import HomeBackground from '../components/HomeBackground';
 import {
     ArrowRight,
     Layers,
@@ -25,7 +26,8 @@ export default function Home() {
 
     // Guests see the landing page
     return (
-        <div>
+        <div className="home-landing">
+            <HomeBackground />
             {/* Hero Section */}
             <section className="hero-section">
                 <div className="hero-content">

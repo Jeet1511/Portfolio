@@ -5,6 +5,7 @@ import {
     Search, Heart, Eye, Layers, TrendingUp, Clock, Star,
     ChevronLeft, ChevronRight, Sparkles, User as UserIcon,
 } from 'lucide-react';
+import DeepSpaceBackground from '../components/backgrounds/DeepSpaceBackground';
 
 const SORT_OPTIONS = [
     { key: 'likes', label: 'Top Rated', icon: TrendingUp },
@@ -77,6 +78,7 @@ export default function Feed() {
 
     return (
         <div className="feed-container">
+            <DeepSpaceBackground />
             {/* Feed Header */}
             <div className="feed-header">
                 <div className="feed-header-content">

@@ -13,6 +13,7 @@ import {
     Code2,
     MoreVertical,
 } from 'lucide-react';
+import { getTechInfo } from '../../data/techStack';
 
 export default function Projects() {
     const { apiFetch } = useAuth();
@@ -146,9 +147,23 @@ export default function Projects() {
 
                                 {project.technologies?.length > 0 && (
                                     <div className="project-tech">
-                                        {project.technologies.map((tech, i) => (
-                                            <span key={i} className="project-tech-tag">{tech}</span>
-                                        ))}
+                                        {project.technologies.map((tech, i) => {
+                                            const info = getTechInfo(tech);
+                                            const isDark = info.color === '#000000' || info.color === '#1a1a2e';
+                                            return (
+                                                <span
+                                                    key={i}
+                                                    className="project-tech-tag"
+                                                    style={{
+                                                        background: isDark ? 'rgba(255, 255, 255, 0.05)' : info.color + '20',
+                                                        color: isDark ? 'var(--text-primary)' : info.color,
+                                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : info.color + '40'
+                                                    }}
+                                                >
+                                                    {tech}
+                                                </span>
+                                            );
+                                        })}
                                     </div>
                                 )}
 
