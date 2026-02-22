@@ -44,16 +44,21 @@ export default function ImageCropper({ onImageCropped, currentImage, label = 'Up
         if (!img || !containerRef.current) return;
 
         const containerRect = containerRef.current.getBoundingClientRect();
-        const scale = Math.min(containerRect.width / img.naturalWidth, containerRect.height / img.naturalHeight, 1);
+        // Container can have padding, so we use the smaller of the two for scale
+        const availW = containerRect.width - 40; // 20px padding on each side
+        const availH = containerRect.height - 40;
+
+        const scale = Math.min(availW / img.naturalWidth, availH / img.naturalHeight, 1);
         const displayW = img.naturalWidth * scale;
         const displayH = img.naturalHeight * scale;
 
         setImgDimensions({ w: displayW, h: displayH, naturalW: img.naturalWidth, naturalH: img.naturalHeight, scale });
 
         // Initialize crop area centered
-        const cropSize = Math.min(displayW, displayH) * 0.7;
+        const cropSize = Math.min(displayW, displayH) * 0.8;
         const cropW = aspectRatio ? cropSize : cropSize;
-        const cropH = aspectRatio ? cropSize / aspectRatio : cropSize;
+        const cropH = aspectRatio ? (cropSize / (aspectRatio || 1)) : cropSize;
+
         setCropArea({
             x: (displayW - cropW) / 2,
             y: (displayH - cropH) / 2,
@@ -317,119 +322,101 @@ export default function ImageCropper({ onImageCropped, currentImage, label = 'Up
                             ref={containerRef}
                             style={{ position: 'relative', overflow: 'hidden', userSelect: 'none' }}
                         >
-                            <img
-                                ref={imgRef}
-                                src={originalImage}
-                                alt="Crop source"
-                                onLoad={handleImageLoad}
+                            <div
                                 style={{
-                                    display: 'block',
-                                    maxWidth: '100%',
-                                    maxHeight: '100%',
-                                    margin: '0 auto',
+                                    position: 'relative',
+                                    width: imgDimensions.w,
+                                    height: imgDimensions.h
                                 }}
-                                draggable={false}
-                            />
+                            >
+                                <img
+                                    ref={imgRef}
+                                    src={originalImage}
+                                    alt="Crop source"
+                                    onLoad={handleImageLoad}
+                                    style={{
+                                        display: 'block',
+                                        width: '100%',
+                                        height: '100%',
+                                    }}
+                                    draggable={false}
+                                />
 
-                            {imgLoaded && (
-                                <>
-                                    {/* Dark overlay outside crop */}
-                                    <div
-                                        className="crop-overlay"
-                                        style={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            width: imgDimensions.w,
-                                            height: imgDimensions.h,
-                                            background: 'rgba(0,0,0,0.6)',
-                                            clipPath: `polygon(
-                        0% 0%, 100% 0%, 100% 100%, 0% 100%,
-                        0% ${cropArea.y}px,
-                        ${cropArea.x}px ${cropArea.y}px,
-                        ${cropArea.x}px ${cropArea.y + cropArea.h}px,
-                        ${cropArea.x + cropArea.w}px ${cropArea.y + cropArea.h}px,
-                        ${cropArea.x + cropArea.w}px ${cropArea.y}px,
-                        0% ${cropArea.y}px
-                      )`,
-                                            pointerEvents: 'none',
-                                        }}
-                                    />
-
-                                    {/* Crop selection box */}
-                                    <div
-                                        className="crop-selection"
-                                        style={{
-                                            position: 'absolute',
-                                            left: cropArea.x,
-                                            top: cropArea.y,
-                                            width: cropArea.w,
-                                            height: cropArea.h,
-                                            border: '2px solid rgba(108, 92, 231, 0.9)',
-                                            boxShadow: '0 0 0 1px rgba(255,255,255,0.3), 0 0 20px rgba(108,92,231,0.3)',
-                                            borderRadius: circular ? '50%' : '2px',
-                                            cursor: 'move',
-                                        }}
-                                        onMouseDown={(e) => handleMouseDown(e, 'move')}
-                                        onTouchStart={(e) => handleMouseDown(e, 'move')}
-                                    >
-                                        {/* Grid lines */}
-                                        <div style={{ position: 'absolute', top: '33.3%', left: 0, right: 0, height: 1, background: 'rgba(255,255,255,0.2)', pointerEvents: 'none' }} />
-                                        <div style={{ position: 'absolute', top: '66.6%', left: 0, right: 0, height: 1, background: 'rgba(255,255,255,0.2)', pointerEvents: 'none' }} />
-                                        <div style={{ position: 'absolute', left: '33.3%', top: 0, bottom: 0, width: 1, background: 'rgba(255,255,255,0.2)', pointerEvents: 'none' }} />
-                                        <div style={{ position: 'absolute', left: '66.6%', top: 0, bottom: 0, width: 1, background: 'rgba(255,255,255,0.2)', pointerEvents: 'none' }} />
-
-                                        {/* Resize handles */}
-                                        {['nw', 'ne', 'sw', 'se', 'n', 's', 'e', 'w'].map((handle) => {
-                                            const styles = {
+                                {imgLoaded && (
+                                    <>
+                                        {/* Dark overlay outside crop */}
+                                        <div
+                                            className="crop-overlay"
+                                            style={{
                                                 position: 'absolute',
-                                                width: handle.length === 2 ? 14 : (handle === 'n' || handle === 's' ? 24 : 14),
-                                                height: handle.length === 2 ? 14 : (handle === 'e' || handle === 'w' ? 24 : 14),
-                                                background: 'var(--accent-primary)',
-                                                border: '2px solid white',
-                                                borderRadius: '2px',
-                                                zIndex: 10,
-                                            };
+                                                top: 0,
+                                                left: 0,
+                                                width: '100%',
+                                                height: '100%',
+                                                background: 'rgba(0,0,0,0.6)',
+                                                clipPath: `polygon(
+                            0% 0%, 100% 0%, 100% 100%, 0% 100%,
+                            0% ${cropArea.y}px,
+                            ${cropArea.x}px ${cropArea.y}px,
+                            ${cropArea.x}px ${cropArea.y + cropArea.h}px,
+                            ${cropArea.x + cropArea.w}px ${cropArea.y + cropArea.h}px,
+                            ${cropArea.x + cropArea.w}px ${cropArea.y}px,
+                            0% ${cropArea.y}px
+                          )`,
+                                                pointerEvents: 'none',
+                                            }}
+                                        />
 
-                                            const cursorMap = { nw: 'nw-resize', ne: 'ne-resize', sw: 'sw-resize', se: 'se-resize', n: 'n-resize', s: 's-resize', e: 'e-resize', w: 'w-resize' };
-                                            styles.cursor = cursorMap[handle];
+                                        {/* Crop selection box */}
+                                        <div
+                                            className="crop-selection"
+                                            style={{
+                                                position: 'absolute',
+                                                left: cropArea.x,
+                                                top: cropArea.y,
+                                                width: cropArea.w,
+                                                height: cropArea.h,
+                                                border: '2px solid rgba(108, 92, 231, 1)',
+                                                boxShadow: '0 0 0 1px rgba(255,255,255,0.4), 0 0 20px rgba(0,0,0,0.4)',
+                                                borderRadius: circular ? '50%' : '2px',
+                                                cursor: 'move',
+                                            }}
+                                            onMouseDown={(e) => handleMouseDown(e, 'move')}
+                                            onTouchStart={(e) => handleMouseDown(e, 'move')}
+                                        >
+                                            {/* Resize handles */}
+                                            {['nw', 'ne', 'sw', 'se'].map((handle) => {
+                                                const styles = {
+                                                    position: 'absolute',
+                                                    width: 12,
+                                                    height: 12,
+                                                    background: 'white',
+                                                    border: '2px solid var(--accent-primary)',
+                                                    borderRadius: '50%',
+                                                    zIndex: 10,
+                                                };
 
-                                            if (handle.includes('n')) styles.top = -7;
-                                            if (handle.includes('s')) styles.bottom = -7;
-                                            if (handle.includes('w')) styles.left = -7;
-                                            if (handle.includes('e')) styles.right = -7;
-                                            if (handle === 'n' || handle === 's') { styles.left = '50%'; styles.transform = 'translateX(-50%)'; }
-                                            if (handle === 'e' || handle === 'w') { styles.top = '50%'; styles.transform = 'translateY(-50%)'; }
+                                                const cursorMap = { nw: 'nw-resize', ne: 'ne-resize', sw: 'sw-resize', se: 'se-resize' };
+                                                styles.cursor = cursorMap[handle];
 
-                                            return (
-                                                <div
-                                                    key={handle}
-                                                    style={styles}
-                                                    onMouseDown={(e) => handleMouseDown(e, handle)}
-                                                    onTouchStart={(e) => handleMouseDown(e, handle)}
-                                                />
-                                            );
-                                        })}
+                                                if (handle.includes('n')) styles.top = -6;
+                                                if (handle.includes('s')) styles.bottom = -6;
+                                                if (handle.includes('w')) styles.left = -6;
+                                                if (handle.includes('e')) styles.right = -6;
 
-                                        {/* Size indicator */}
-                                        <div style={{
-                                            position: 'absolute',
-                                            bottom: -28,
-                                            left: '50%',
-                                            transform: 'translateX(-50%)',
-                                            background: 'rgba(0,0,0,0.8)',
-                                            color: 'white',
-                                            fontSize: '0.7rem',
-                                            padding: '3px 8px',
-                                            borderRadius: 4,
-                                            whiteSpace: 'nowrap',
-                                            pointerEvents: 'none',
-                                        }}>
-                                            {Math.round(cropArea.w / imgDimensions.scale)} x {Math.round(cropArea.h / imgDimensions.scale)}
+                                                return (
+                                                    <div
+                                                        key={handle}
+                                                        style={styles}
+                                                        onMouseDown={(e) => handleMouseDown(e, handle)}
+                                                        onTouchStart={(e) => handleMouseDown(e, handle)}
+                                                    />
+                                                );
+                                            })}
                                         </div>
-                                    </div>
-                                </>
-                            )}
+                                    </>
+                                )}
+                            </div>
                         </div>
 
                         <div className="cropper-footer">
