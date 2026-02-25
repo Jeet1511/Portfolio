@@ -1,4 +1,5 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import Project from '../models/Project.js';
 import ProfileView from '../models/ProfileView.js';
@@ -34,7 +35,8 @@ router.get('/discover', async (req, res) => {
             .select('-password -likes')
             .sort(sortOption)
             .skip(skip)
-            .limit(parseInt(limit));
+            .limit(parseInt(limit))
+            .lean();
 
         // Get project counts for each user
         const userIds = users.map(u => u._id);
@@ -46,7 +48,18 @@ router.get('/discover', async (req, res) => {
         projectCounts.forEach(pc => { countMap[pc._id.toString()] = pc.count; });
 
         const enrichedUsers = users.map(u => ({
-            ...u.toPublicJSON(),
+            id: u._id,
+            username: u.username,
+            displayName: u.displayName,
+            bio: u.bio,
+            avatar: u.avatar,
+            skills: u.skills,
+            socialLinks: u.socialLinks,
+            customSocialLinks: u.customSocialLinks || [],
+            backgroundStyle: u.backgroundStyle || 'orbs',
+            profileViews: u.profileViews,
+            likeCount: u.likeCount || 0,
+            createdAt: u.createdAt,
             projectCount: countMap[u._id.toString()] || 0,
         }));
 
@@ -97,63 +110,122 @@ router.post('/:id/like', protect, async (req, res) => {
     }
 });
 
-// GET /api/users/:username - Public profile
-router.get('/:username', async (req, res) => {
+// Helper: fire-and-forget view tracking (non-blocking)
+function trackView(req, userId) {
+    const visitorIp = (req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown')
+        .split(',')[0].trim();
+
+    let isOwner = false;
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+        try {
+            const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
+            if (decoded.id && decoded.id.toString() === userId.toString()) {
+                isOwner = true;
+            }
+        } catch { }
+    }
+
+    if (!isOwner) {
+        // Fire-and-forget: don't await, don't block the response
+        ProfileView.create({ profileId: userId, ip: visitorIp })
+            .then(() => User.updateOne({ _id: userId }, { $inc: { profileViews: 1 } }))
+            .catch(err => {
+                if (err.code !== 11000) console.error('View tracking error:', err);
+            });
+    }
+}
+
+// GET /api/users/:username/portfolio - Combined profile + projects (single round-trip)
+router.get('/:username/portfolio', async (req, res) => {
     try {
         const user = await User.findOne({
             username: req.params.username.toLowerCase(),
             isActive: true,
-        });
+        }).select('-password -likes').lean();
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // --- IP-based view counting (1 view per IP per profile per day) ---
-        const visitorIp = (req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown')
-            .split(',')[0].trim();
+        // Fetch projects in parallel (non-blocking view tracking)
+        const projectsPromise = Project.find({
+            userId: user._id,
+            status: 'active',
+        }).sort({ featured: -1, order: 1, createdAt: -1 }).lean();
 
-        // Check if visitor is the profile owner (skip view for owners)
-        let isOwner = false;
-        const authHeader = req.headers.authorization;
-        if (authHeader) {
-            try {
-                const jwt = await import('jsonwebtoken');
-                const decoded = jwt.default.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
-                if (decoded.id && decoded.id.toString() === user._id.toString()) {
-                    isOwner = true;
-                }
-            } catch { }
+        // Fire-and-forget view tracking
+        trackView(req, user._id);
+
+        const projects = await projectsPromise;
+
+        // Format user for public consumption
+        const publicUser = {
+            id: user._id,
+            username: user.username,
+            displayName: user.displayName,
+            bio: user.bio,
+            avatar: user.avatar,
+            skills: user.skills,
+            socialLinks: user.socialLinks,
+            customSocialLinks: user.customSocialLinks || [],
+            backgroundStyle: user.backgroundStyle || 'orbs',
+            profileViews: user.profileViews,
+            likeCount: user.likeCount || 0,
+            createdAt: user.createdAt,
+        };
+
+        res.json({ user: publicUser, projects });
+    } catch (error) {
+        console.error('Get portfolio error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// GET /api/users/:username - Public profile (legacy, kept for backwards compat)
+router.get('/:username', async (req, res) => {
+    try {
+        const user = await User.findOne({
+            username: req.params.username.toLowerCase(),
+            isActive: true,
+        }).select('-password -likes').lean();
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        if (!isOwner) {
-            try {
-                // Try to insert a view record (unique per IP + profile, TTL 24h)
-                await ProfileView.create({ profileId: user._id, ip: visitorIp });
-                // If insert succeeded, this IP hasn't viewed this profile today → count it
-                await User.updateOne({ _id: user._id }, { $inc: { profileViews: 1 } });
-            } catch (err) {
-                // Duplicate key error (11000) = this IP already viewed today → skip
-                if (err.code !== 11000) {
-                    console.error('View tracking error:', err);
-                }
-            }
-        }
+        // Fire-and-forget view tracking
+        trackView(req, user._id);
 
-        res.json({ user: user.toPublicJSON() });
+        const publicUser = {
+            id: user._id,
+            username: user.username,
+            displayName: user.displayName,
+            bio: user.bio,
+            avatar: user.avatar,
+            skills: user.skills,
+            socialLinks: user.socialLinks,
+            customSocialLinks: user.customSocialLinks || [],
+            backgroundStyle: user.backgroundStyle || 'orbs',
+            profileViews: user.profileViews,
+            likeCount: user.likeCount || 0,
+            createdAt: user.createdAt,
+        };
+
+        res.json({ user: publicUser });
     } catch (error) {
         console.error('Get user error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-// GET /api/users/:username/projects - Public projects
+// GET /api/users/:username/projects - Public projects (legacy, kept for backwards compat)
 router.get('/:username/projects', async (req, res) => {
     try {
         const user = await User.findOne({
             username: req.params.username.toLowerCase(),
             isActive: true,
-        });
+        }).select('_id').lean();
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -162,7 +234,7 @@ router.get('/:username/projects', async (req, res) => {
         const projects = await Project.find({
             userId: user._id,
             status: 'active',
-        }).sort({ featured: -1, order: 1, createdAt: -1 });
+        }).sort({ featured: -1, order: 1, createdAt: -1 }).lean();
 
         res.json({ projects });
     } catch (error) {

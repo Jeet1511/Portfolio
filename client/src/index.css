@@ -8199,3 +8199,22 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================
+   Skeleton Loading Animation
+   ============================================ */
+@keyframes skeletonPulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.skeleton-pulse {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}

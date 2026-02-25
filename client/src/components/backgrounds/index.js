@@ -1,26 +1,28 @@
-import OrbsBackground from './OrbsBackground';
-import WavesBackground from './WavesBackground';
-import MatrixBackground from './MatrixBackground';
-import ConstellationBackground from './ConstellationBackground';
-import GradientMeshBackground from './GradientMeshBackground';
-import NeonGridBackground from './NeonGridBackground';
-import ParticleVortexBackground from './ParticleVortexBackground';
-import HolographicBackground from './HolographicBackground';
-import FirefliesBackground from './FirefliesBackground';
-import PlasmaBackground from './PlasmaBackground';
-import DigitalRainBackground from './DigitalRainBackground';
-import NebulaBackground from './NebulaBackground';
-import LightningBackground from './LightningBackground';
-import StarfieldWarpBackground from './StarfieldWarpBackground';
-import ShootingStarsBackground from './ShootingStarsBackground';
-import GalaxySpiralBackground from './GalaxySpiralBackground';
-import CircuitBoardBackground from './CircuitBoardBackground';
-import AuroraBorealisBackground from './AuroraBorealisBackground';
-import CyberTunnelBackground from './CyberTunnelBackground';
-import DeepSpaceBackground from './DeepSpaceBackground';
-import QuantumFieldBackground from './QuantumFieldBackground';
-import HologramGridBackground from './HologramGridBackground';
-import WormholeBackground from './WormholeBackground';
+import { lazy } from 'react';
+
+const OrbsBackground = lazy(() => import('./OrbsBackground'));
+const WavesBackground = lazy(() => import('./WavesBackground'));
+const MatrixBackground = lazy(() => import('./MatrixBackground'));
+const ConstellationBackground = lazy(() => import('./ConstellationBackground'));
+const GradientMeshBackground = lazy(() => import('./GradientMeshBackground'));
+const NeonGridBackground = lazy(() => import('./NeonGridBackground'));
+const ParticleVortexBackground = lazy(() => import('./ParticleVortexBackground'));
+const HolographicBackground = lazy(() => import('./HolographicBackground'));
+const FirefliesBackground = lazy(() => import('./FirefliesBackground'));
+const PlasmaBackground = lazy(() => import('./PlasmaBackground'));
+const DigitalRainBackground = lazy(() => import('./DigitalRainBackground'));
+const NebulaBackground = lazy(() => import('./NebulaBackground'));
+const LightningBackground = lazy(() => import('./LightningBackground'));
+const StarfieldWarpBackground = lazy(() => import('./StarfieldWarpBackground'));
+const ShootingStarsBackground = lazy(() => import('./ShootingStarsBackground'));
+const GalaxySpiralBackground = lazy(() => import('./GalaxySpiralBackground'));
+const CircuitBoardBackground = lazy(() => import('./CircuitBoardBackground'));
+const AuroraBorealisBackground = lazy(() => import('./AuroraBorealisBackground'));
+const CyberTunnelBackground = lazy(() => import('./CyberTunnelBackground'));
+const DeepSpaceBackground = lazy(() => import('./DeepSpaceBackground'));
+const QuantumFieldBackground = lazy(() => import('./QuantumFieldBackground'));
+const HologramGridBackground = lazy(() => import('./HologramGridBackground'));
+const WormholeBackground = lazy(() => import('./WormholeBackground'));
 
 export const backgroundComponents = {
     orbs: OrbsBackground,

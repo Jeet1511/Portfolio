@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getTechInfo } from '../data/techStack';
@@ -39,20 +39,16 @@ export default function PublicPortfolio() {
 
         const fetchPortfolio = async () => {
             try {
-                const userRes = await fetch(`${API_BASE}/users/${username}`);
-                if (!userRes.ok) {
+                // Single combined endpoint — one round-trip for user + projects
+                const res = await fetch(`${API_BASE}/users/${username}/portfolio`);
+                if (!res.ok) {
                     setError('Portfolio not found');
                     setLoading(false);
                     return;
                 }
-                const userData = await userRes.json();
-                setUser(userData.user);
-
-                const projRes = await fetch(`${API_BASE}/users/${username}/projects`);
-                if (projRes.ok) {
-                    const projData = await projRes.json();
-                    setProjects(projData.projects);
-                }
+                const data = await res.json();
+                setUser(data.user);
+                setProjects(data.projects || []);
             } catch (err) {
                 setError('Failed to load portfolio');
             } finally {
@@ -91,8 +87,12 @@ export default function PublicPortfolio() {
 
     if (loading) {
         return (
-            <div className="loading-page">
-                <div className="loading-spinner" />
+            <div className="portfolio-page">
+                <div className="portfolio-header fade-in-up">
+                    <div className="portfolio-avatar skeleton-pulse" style={{ background: 'var(--bg-tertiary)' }} />
+                    <div className="skeleton-pulse" style={{ width: 180, height: 24, borderRadius: 8, margin: '16px auto 8px', background: 'var(--bg-tertiary)' }} />
+                    <div className="skeleton-pulse" style={{ width: 120, height: 16, borderRadius: 6, margin: '0 auto', background: 'var(--bg-tertiary)' }} />
+                </div>
             </div>
         );
     }
@@ -147,11 +147,15 @@ export default function PublicPortfolio() {
 
     return (
         <>
-            {/* Background Animation */}
+            {/* Background Animation (lazy-loaded) */}
             {(() => {
                 const bgKey = user.backgroundStyle || 'orbs';
                 const BgComponent = backgroundComponents[bgKey];
-                return BgComponent ? <BgComponent /> : null;
+                return BgComponent ? (
+                    <Suspense fallback={null}>
+                        <BgComponent />
+                    </Suspense>
+                ) : null;
             })()}
 
             <div className="portfolio-page">
